@@ -21,6 +21,7 @@ class LandingPage(Frame):
         self.font3 = f.Font(family='Yu Gothic UI Light', size=18)
         self.font4 = f.Font(family='Yu Gothic UI Light', size=13)
         self.font5 = f.Font(family='Yu Gothic UI Light', size=11, weight='normal')
+        self.font6 = f.Font(family='Yu Gothic UI Light', size=13, weight='normal',underline=True)
 
         self.blackcolor = '#080808'
         self.darkredcolor='#ED4B3A'
@@ -86,6 +87,12 @@ class LandingPage(Frame):
         self.backward = ImageTk.PhotoImage(Image.open("fast-forward-1.png"))
         self.roundrect=ImageTk.PhotoImage(Image.open("greybg_train_journey.png").resize((343,120),))
         self.seatspace = ImageTk.PhotoImage(Image.open("base train bg.png").resize((340,180),))
+        self.pic = ImageTk.PhotoImage(Image.open("high-speed-train.png"))
+        self.captain = ImageTk.PhotoImage(Image.open("police (1).png").resize((64,64),))
+        self.captain2 = ImageTk.PhotoImage(Image.open("police (2).png").resize((64,64),))
+        self.premium2 = ImageTk.PhotoImage(Image.open("insurance.png").resize((64,64),))
+        self.captain3 = ImageTk.PhotoImage(Image.open("police (4).png").resize((64,64),))
+        self.relax = ImageTk.PhotoImage(Image.open("relax.png"))
 
 
 
@@ -94,7 +101,7 @@ class LandingPage(Frame):
         self.navbar.grid(row=0,column=0,sticky=NW)
 
         # LOGO
-        self.logo_btn = Button(self.navbar, image=self.logo,border=0,cursor='hand2',command=lambda: self.cmd(0),bg=self.bluecolor)
+        self.logo_btn = Button(self.navbar, image=self.logo,border=0,cursor='hand2',command=self.show_landing_page,bg=self.bluecolor)
         self.logo_btn.grid(row=0,column=0,pady=10,sticky=NW)
         self.username_display=Label(self.navbar,text=self.username.upper(),font=self.font2,bg=self.bluecolor,fg=self.greencolor)
         # self.username_display.grid(row=0,column=1,sticky=E,padx=(740+self.deficit,0))
@@ -111,7 +118,30 @@ class LandingPage(Frame):
             self.mainmenu.menu.add_radiobutton(label=menuitems[i],value=menuitems[i], variable=self.menuvar,font=self.font2)
 
         # LANDING PAGE
-        self.landing_page=Frame(self.master,)
+        self.landing_page=Frame(self.master,bg=self.bluecolor)
+        self.landing_page.grid(row=1,column=0,sticky=NW)
+        Label(self.landing_page, image=self.captain, bg=self.bluecolor).grid(row=0,padx=(20,0), column=0,sticky=NW)
+        Label(self.landing_page,text=f'WELCOME BACK {self.f_name.upper()}!',font=self.font1,bg=self.bluecolor,fg=self.greencolor).grid(row=0,column=1,columnspan=2,sticky=NW)
+        text='In case you forgot, RAILLY our little app, has\n made train booking your LAGOS-IBADAN\n metro booking easy and user friendly...'
+        Label(self.landing_page,text=text,font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=1,column=2,pady=(15,10),padx=(450,0),sticky=NE)
+        Label(self.landing_page, image=self.captain2, bg=self.bluecolor).grid(row=1, column=3,pady=(15,10),sticky=NE)
+        text2='Make quick transactions without having to put\n your card details everytime you wish to make\n payment, with our secure cloud data storage...'
+        Label(self.landing_page, image=self.premium2, bg=self.bluecolor).grid(row=2,padx=(20,0), column=0,sticky=NW)
+        Label(self.landing_page,text=text2,font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=2,column=1,sticky=NW,columnspan=2)
+        text3='Our system is advanced enough to allow\n a single user to book a slots for family and/or\n friends, up to a whooping number of 6...'
+        Label(self.landing_page,text=text3,font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=3,column=2,pady=(15,10),padx=(450,0),sticky=NE)
+        Label(self.landing_page, image=self.captain3, bg=self.bluecolor).grid(row=3, column=3,pady=(15,10),sticky=NE)
+        text4='Sit back, relax and watch RAILLY do its thing,\n thanks for using our app and have a great travel!'
+        Label(self.landing_page, image=self.relax, bg=self.bluecolor).grid(row=4,padx=(20,0), column=0,sticky=NW,pady=(15,0))
+        Label(self.landing_page,text=text4,font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=4,column=1,sticky=NW,pady=(15,0),columnspan=2)
+        self.continue_btn=Button(self.landing_page,text='Click here to continue>>>',font=self.font6,bg=self.bluecolor,
+                                 fg=self.greencolor,border=0,cursor='hand2',command=self.continue_btn_action)
+        self.continue_btn.grid(row=5, column=2,padx=(450,0),sticky=NE)
+        self.continue_btn.bind("<Enter>",self.on_enter)
+        self.continue_btn.bind("<Leave>",self.on_leave)
+
+
+
         # BOOK FLIGHT PAGE
         self.bookpage=Frame(self.master,bg=self.whitecolor)
         # self.bookpage.grid(row=1,column=0,sticky=NW)
@@ -418,6 +448,21 @@ class LandingPage(Frame):
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.firstclass_price} x {self.numvar.get()} = N{self.firstclass_price * int(self.numvar.get())}.00')
 
+    def continue_btn_action(self):
+        self.master.configure(bg=self.whitecolor)
+        self.landing_page.grid_forget()
+        self.bookpage.grid(row=1,column=0,sticky=NW)
+
+    def show_landing_page(self):
+        self.master.configure(bg=self.bluecolor)
+        self.bookpage.grid_forget()
+        self.landing_page.grid(row=1,column=0,sticky=NW)
+
+    def on_enter(self,event):
+        self.continue_btn.config(fg=self.whitecolor)
+
+    def on_leave(self,event):
+        self.continue_btn.config(fg=self.greencolor)
 
 
 
@@ -428,7 +473,7 @@ class LandingPage(Frame):
 
 root=Tk()
 root.resizable(0, 0)
-root.configure(bg='#FFFFFF')
+root.configure(bg='#110445')
 root.geometry('1000x600+183+60')
 root.title('R A I L L Y')
 # root.overrideredirect(1)
