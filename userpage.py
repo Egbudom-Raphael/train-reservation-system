@@ -18,7 +18,7 @@ class LandingPage(Frame):
 
         self.font1=f.Font(family='Yu Gothic UI Semilight', size=30, weight='normal')
         self.font2 = f.Font(family='Yu Gothic UI Semilight', size=13, weight='normal')
-        self.font3 = f.Font(family='Yu Gothic UI Light', size=18)
+        self.font3 = f.Font(family='Yu Gothic UI Light', size=9)
         self.font4 = f.Font(family='Yu Gothic UI Light', size=13)
         self.font5 = f.Font(family='Yu Gothic UI Light', size=11, weight='normal')
         self.font6 = f.Font(family='Yu Gothic UI Light', size=13, weight='normal',underline=True)
@@ -53,7 +53,7 @@ class LandingPage(Frame):
         self.business_price=self.regular_price*2
         self.firstclass_price=self.regular_price*3
         self.menuvar=StringVar()
-        self.numvar=StringVar()
+        self.numvar=IntVar()
         self.childvar=StringVar()
         self.date = dt.datetime.now()
         self.maxdate=self.date+relativedelta(years=0,months=6,days=0)
@@ -65,6 +65,11 @@ class LandingPage(Frame):
         self.logout = ImageTk.PhotoImage(Image.open("profile-user.png"))
         self.entrybg=ImageTk.PhotoImage(Image.open("img_textBox0.png"))
         self.entrybg2=ImageTk.PhotoImage(Image.open("img_textBox0.png").resize((343,69),))
+        self.entryimg = ImageTk.PhotoImage(Image.open("textBox1.png").resize((250, 30)))
+        self.entryimg2 = ImageTk.PhotoImage(Image.open("textBox1.png").resize((70, 30)))
+        self.entryimg3 = ImageTk.PhotoImage(Image.open("textBox1.png").resize((300, 30)))
+        self.entryimg4 = ImageTk.PhotoImage(Image.open("textBox1.png").resize((300, 30)))
+        self.entryimg5 = ImageTk.PhotoImage(Image.open("textBox1.png").resize((200, 30)))
         self.down=ImageTk.PhotoImage(Image.open("drop down button.png"))
         self.switch = ImageTk.PhotoImage(Image.open("img1.png"))#.transpose(Image.ROTATE_90)
         self.next_img=ImageTk.PhotoImage(Image.open("img4.png"))
@@ -93,6 +98,15 @@ class LandingPage(Frame):
         self.premium2 = ImageTk.PhotoImage(Image.open("insurance.png").resize((64,64),))
         self.captain3 = ImageTk.PhotoImage(Image.open("police (4).png").resize((64,64),))
         self.relax = ImageTk.PhotoImage(Image.open("relax.png"))
+        self.visacard=ImageTk.PhotoImage(Image.open("visa.png"))
+        self.paypalcard=ImageTk.PhotoImage(Image.open("paypal.png"))
+        self.americacard=ImageTk.PhotoImage(Image.open("american-express.png"))
+        self.card=ImageTk.PhotoImage(Image.open("credit-card.png"))
+        self.back_img=ImageTk.PhotoImage(Image.open("back-button2.png"))
+        self.toggle_btn_img = ImageTk.PhotoImage(Image.open("view.png"))
+        self.toggle_btn_img2 = ImageTk.PhotoImage(Image.open("hide.png"))
+        self.login_btn = ImageTk.PhotoImage(Image.open("loginButton.png").resize((150,35)))
+
 
 
 
@@ -101,7 +115,7 @@ class LandingPage(Frame):
         self.navbar.grid(row=0,column=0,sticky=NW)
 
         # LOGO
-        self.logo_btn = Button(self.navbar, image=self.logo,border=0,cursor='hand2',command=self.show_landing_page,bg=self.bluecolor)
+        self.logo_btn = Button(self.navbar, image=self.logo,border=0,cursor='hand2',command=lambda: self.page_switcher(0),bg=self.bluecolor)
         self.logo_btn.grid(row=0,column=0,pady=10,sticky=NW)
         self.username_display=Label(self.navbar,text=self.username.upper(),font=self.font2,bg=self.bluecolor,fg=self.greencolor)
         # self.username_display.grid(row=0,column=1,sticky=E,padx=(740+self.deficit,0))
@@ -115,7 +129,8 @@ class LandingPage(Frame):
         self.mainmenu.menu = Menu(self.mainmenu, tearoff=0)
         self.mainmenu['menu'] = self.mainmenu.menu
         for i in range(len(menuitems)):
-            self.mainmenu.menu.add_radiobutton(label=menuitems[i],value=menuitems[i], variable=self.menuvar,font=self.font2)
+            self.mainmenu.menu.add_radiobutton(label=menuitems[i],value=menuitems[i], variable=self.menuvar,
+                                               command=lambda: self.mainmenu_action(self.menuvar.get()),font=self.font2)
 
         # LANDING PAGE
         self.landing_page=Frame(self.master,bg=self.bluecolor)
@@ -135,7 +150,7 @@ class LandingPage(Frame):
         Label(self.landing_page, image=self.relax, bg=self.bluecolor).grid(row=4,padx=(20,0), column=0,sticky=NW,pady=(15,0))
         Label(self.landing_page,text=text4,font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=4,column=1,sticky=NW,pady=(15,0),columnspan=2)
         self.continue_btn=Button(self.landing_page,text='Click here to continue>>>',font=self.font6,bg=self.bluecolor,
-                                 fg=self.greencolor,border=0,cursor='hand2',command=self.continue_btn_action)
+                                 fg=self.greencolor,border=0,cursor='hand2',command=lambda: self.page_switcher(1))
         self.continue_btn.grid(row=5, column=2,padx=(450,0),sticky=NE)
         self.continue_btn.bind("<Enter>",self.on_enter)
         self.continue_btn.bind("<Leave>",self.on_leave)
@@ -143,28 +158,28 @@ class LandingPage(Frame):
 
 
         # BOOK FLIGHT PAGE
-        self.bookpage=Frame(self.master,bg=self.whitecolor)
-        # self.bookpage.grid(row=1,column=0,sticky=NW)
+        self.book_page=Frame(self.master,bg=self.whitecolor)
+        # self.book_page.grid(row=1,column=0,sticky=NW)
         
         # PAGE COUNTER AT THE TOP
-        self.marker = Frame(self.bookpage,bg=self.whitecolor,width=80)
+        self.marker = Frame(self.book_page,bg=self.whitecolor,width=80)
         self.marker.grid(row=0,column=0,sticky=N,columnspan=2,pady=10,padx=(50,0))
-        self.where=Label(self.marker, image=self.cirle2, bg=self.whitecolor)
+        self.where=Label(self.marker, image=self.cirle2,cursor='hand2', bg=self.whitecolor)
         self.where.grid(row=0, column=0,padx=5,sticky=NS)
-        self.when=Label(self.marker, image=self.cirle, bg=self.whitecolor)
+        self.when=Label(self.marker, image=self.cirle,cursor='hand2', bg=self.whitecolor)
         self.when.grid(row=0, column=1,padx=5, sticky=NS)
-        self.how=Label(self.marker, image=self.cirle, bg=self.whitecolor)
+        self.how=Label(self.marker, image=self.cirle,cursor='hand2', bg=self.whitecolor)
         self.how.grid(row=0, column=2,padx=5, sticky=NS)
         
         # RIGHT FLOAT PICTURE
-        self.right_frm=Frame(self.bookpage,bg=self.whitecolor)
+        self.right_frm=Frame(self.book_page,bg=self.whitecolor)
         self.right_frm.grid(row=1,column=1,padx=(112,120),sticky=NW)
         self.where_img=Label(self.right_frm, image=self.dest_img, bg=self.whitecolor)
         self.where_img.grid(row=0, column=0,sticky=N)
 
         
         # WHERE DO YOU WANT TO GO
-        self.dest_frm=Frame(self.bookpage,bg=self.whitecolor)
+        self.dest_frm=Frame(self.book_page,bg=self.whitecolor)
         self.dest_frm.grid(row=1,column=0,padx=(100,0))
         Label(self.dest_frm,text='Where do you\nwant to go?',font=self.font1,bg=self.whitecolor,fg=self.bluecolor).grid(row=0,column=0,pady=20,sticky=NW)
         Label(self.dest_frm, image=self.entrybg, bg=self.whitecolor).grid(row=1, column=0,rowspan=2,sticky=NW,columnspan=2)
@@ -185,7 +200,7 @@ class LandingPage(Frame):
         
 
         # WHEN DO YOU WANT TO GO
-        self.date_frm = Frame(self.bookpage, bg=self.whitecolor)
+        self.date_frm = Frame(self.book_page, bg=self.whitecolor)
         # self.date_frm.grid(row=1, column=0, padx=(100, 0))
         Label(self.date_frm, text='When do you\nwant to go?', font=self.font1, bg=self.whitecolor,
               fg=self.bluecolor).grid(row=0, column=0, pady=20, sticky=NW)
@@ -234,7 +249,7 @@ class LandingPage(Frame):
 
 
         # HOW DO YOU WANT TO GO
-        self.class_frm=Frame(self.bookpage, bg=self.whitecolor)
+        self.class_frm=Frame(self.book_page, bg=self.whitecolor)
         # self.class_frm.grid(row=1, column=0, padx=(100, 0),sticky=NW)
         Label(self.class_frm, text='How do you\nwant to go?', font=self.font1, bg=self.whitecolor,
               fg=self.bluecolor).grid(row=0, column=0, pady=20,columnspan=2, sticky=NW)
@@ -243,7 +258,7 @@ class LandingPage(Frame):
                                                                           columnspan=3)
         Label(self.class_frm, text='NO. OF PASSENGERS', font=self.font2, bg=self.lightgreycolor,
               fg=self.bluecolor).grid(row=1,column=0,sticky=NW,columnspan=2,pady=(7, 0),padx=(27,0))
-        self.passnum = Label(self.class_frm, text='1 PERSON', font=self.font2, bg=self.lightgreycolor,
+        self.passnum = Label(self.class_frm, text='SELECT No OF PASSENGERS', font=self.font2, bg=self.lightgreycolor,
                          fg=self.darkgreencolor)
         self.passnum.grid(row=2, column=0, sticky=NW,columnspan=2, padx=(27,0))
         self.num_menu = Menubutton(self.class_frm,font=self.font5,fg=self.bluecolor,
@@ -271,10 +286,11 @@ class LandingPage(Frame):
                bg=self.whitecolor,command=lambda: self.cmd(1))
         self.class_back.grid(row=6, column=0, pady=3,padx=(0,5),sticky=NW)
         self.class_next=Button(self.class_frm, image=self.next_img, border=0, cursor='hand2',
-               bg=self.whitecolor)#,command=self.show_passform
+               bg=self.whitecolor,command=lambda: self.page_switcher(2))
         self.class_next.grid(row=6, column=0,padx=60,sticky=NW)
 
 
+        # PASSENGER NUMBER RIGHT SIDE PAGE
         self.pass_details=Frame(self.right_frm,bg=self.whitecolor)
         # self.pass_details.grid(row=0, column=0, sticky=NW)
         self.person_lbl=Label(self.pass_details, text=f'PERSON {self.num_of_people[0]}', font=self.font2, bg=self.whitecolor,
@@ -308,6 +324,122 @@ class LandingPage(Frame):
         self.sub_total_lbl=Label(self.pricepanel, text=' ', font=self.font2, bg=self.lightergreycolor,
               fg=self.darkgreencolor)
         self.sub_total_lbl.grid(row=2, column=0,columnspan=2, sticky=NW, pady=(4, 0), padx=(25, 0))
+
+
+        # PAYMENT PORTAL
+        self.payment_page = Frame(self.master, bg=self.lightgreycolor)
+        # self.payment_page.grid(row=1, column=0, sticky=NW)
+        Button(self.payment_page,image=self.back_img,bg=self.lightgreycolor,cursor='hand2',border=0,command=lambda: self.page_switcher(1)).grid(row=0,column=0,pady=(5,0),padx=(40,0),sticky=W)
+        Label(self.payment_page, text='PAYMENT PORTAL', font=self.font1, bg=self.lightgreycolor,fg=self.bluecolor).grid(row=0,column=0)
+        self.payment_frm = Frame(self.payment_page, bg=self.lightgreycolor)
+        self.payment_frm.grid(row=1, column=0,padx=100,pady=10, sticky=NW)
+        Label(self.payment_frm, text='Card Number*', font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1,column=0,sticky=NW)
+        Label(self.payment_frm, image=self.entryimg, bg=self.lightgreycolor).grid(row=2, column=0,sticky=NW)
+        self.card_num=Entry(self.payment_frm,bg=self.whitecolor,fg=self.darkgreencolor,width=27,font=self.font2,border=0)
+        self.card_num.grid(row=2,column=0,sticky=NW,padx=5,pady=5)
+        Label(self.payment_frm, image=self.visacard, bg=self.lightgreycolor).grid(row=3, column=0,sticky=NW)
+        Label(self.payment_frm, image=self.americacard, bg=self.lightgreycolor).grid(row=3, column=0,sticky=NW,padx=(40,0))
+        Label(self.payment_frm, image=self.paypalcard, bg=self.lightgreycolor).grid(row=3, column=0,sticky=NW,padx=(80,0))
+
+        Label(self.payment_frm, text='Expiry Month*', font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor).grid(row=4,pady=(5,0),column=0,sticky=NW)
+        Label(self.payment_frm, text='Expiry Year*', font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor).grid(row=4,pady=(5,0),column=0,padx=(120,0),sticky=NW)
+        Label(self.payment_frm, image=self.entryimg2, bg=self.lightgreycolor).grid(row=5, column=0,sticky=NW)
+        Label(self.payment_frm, image=self.entryimg2, bg=self.lightgreycolor).grid(row=5, column=0,sticky=NW,padx=(120,0))
+        self.exp_month=Entry(self.payment_frm,bg=self.whitecolor,fg=self.darkgreencolor,width=7,font=self.font2,border=0)
+        self.exp_month.grid(row=5, column=0,sticky=NW,pady=5,padx=5)
+        self.exp_year=Entry(self.payment_frm,bg=self.whitecolor,fg=self.darkgreencolor,width=7,font=self.font2,border=0)
+        self.exp_year.grid(row=5,column=0,padx=(125,0),sticky=NW,pady=5)
+        Label(self.payment_frm, text='Card Holder Name*', font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor).grid(row=6,column=0,pady=(5,0),sticky=NW)
+        Label(self.payment_frm, image=self.entryimg3, bg=self.lightgreycolor).grid(row=7, column=0,sticky=NW)
+        self.card_holder=Entry(self.payment_frm,bg=self.whitecolor,fg=self.darkgreencolor,width=32,font=self.font2,border=0)
+        self.card_holder.grid(row=7,column=0,sticky=NW,padx=5,pady=5)
+        Label(self.payment_frm, text='Security code*', font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor).grid(row=8,column=0,pady=(5,0),sticky=NW)
+        Label(self.payment_frm, image=self.entryimg2, bg=self.lightgreycolor).grid(row=9, column=0,sticky=NW)
+        self.sec_code=Entry(self.payment_frm,show='•',bg=self.whitecolor,fg=self.darkgreencolor,width=7,font=self.font2,border=0)
+        self.sec_code.grid(row=9, column=0,sticky=NW,pady=5,padx=5)
+        Label(self.payment_frm, image=self.card, bg=self.lightgreycolor).grid(row=9, column=0,sticky=NW,padx=(80,0))
+        Label(self.payment_frm, text='3 digits on the back of your card*', font=self.font3, bg=self.lightgreycolor,fg=self.greycolor).grid(row=9,column=0,padx=(120,0),sticky=W)
+        self.remember=Checkbutton(self.payment_frm,text='Remember card details for next purchase',bg=self.lightgreycolor,
+                                  cursor='hand2',fg=self.darkgreencolor,font=self.font2)
+        self.remember.grid(row=10,column=0,pady=(5,0),sticky=NW)
+        self.remember.select()
+        self.pay_btn=Button(self.payment_frm,text='Pay',font=self.font2,width=17,fg=self.whitecolor,bg=self.greencolor,cursor='hand2',border=0)
+        self.pay_btn.grid(row=11,column=0,pady=(5,0),padx=(170,0),sticky=W)
+        Label(self.payment_page, image=self.premium, bg=self.lightgreycolor).grid(row=1, column=1,sticky=W,pady=(0,60),padx=(80,0))
+        self.where.bind("<Button-1>", lambda e: self.cmd(0))
+        self.when.bind("<Button-1>", lambda e: self.cmd(1))
+        self.how.bind("<Button-1>", lambda e: self.cmd(2))
+
+        # EDIT PROFILE PAGE
+        self.edit_page = Frame(self.master, bg=self.lightgreycolor)
+        # self.edit_page.grid(row=1, column=0, sticky=NW)
+        self.edit_frm = Frame(self.edit_page, bg=self.lightgreycolor)
+        self.edit_frm.grid(row=2, column=1, padx=5, sticky=W,pady=(30,0))
+        Button(self.edit_page, image=self.back_img, border=0, cursor='hand2', command=lambda: self.page_switcher(1),
+               bg=self.lightgreycolor).grid(row=1, column=0, sticky=NW, pady=15,padx=(20,0))
+        Label(self.edit_page, text="EDIT PROFILE", font=self.font1, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=1, column=0, sticky=NW, columnspan=2, pady=(0, 10), padx=(60, 0))
+
+        Label(self.edit_frm, text="F I R S T  N A M E", font=self.font2, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=1, column=0, padx=(0, 10), sticky=W)
+        Label(self.edit_frm, image=self.entryimg5, bg=self.lightgreycolor).grid(row=2, column=0, padx=(0, 10), sticky=W)
+        self.f_name_ent = Entry(self.edit_frm, bg=self.whitecolor, width=21, border=0, font=self.font2,
+                            fg=self.darkgreencolor)
+        self.f_name_ent.insert(0,self.f_name.title())
+        self.f_name_ent.grid(row=2, column=0, padx=(0, 10))
+        Label(self.edit_frm, text="M I D D L E  N A M E", font=self.font2, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=1, column=1, padx=(0, 10), sticky=W)
+        Label(self.edit_frm, image=self.entryimg5, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=2, column=1, padx=(0, 10), sticky=W)
+        self.m_name_ent = Entry(self.edit_frm, bg=self.whitecolor, width=21, border=0, font=self.font2,
+                            fg=self.darkgreencolor)
+        self.m_name_ent.insert(0, self.m_name.title())
+        self.m_name_ent.grid(row=2, column=1, padx=(0, 10))
+        Label(self.edit_frm, text="L A S T  N A M E", font=self.font2, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=1, column=2, sticky=W)
+        Label(self.edit_frm, image=self.entryimg5, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=2, column=2, sticky=W)
+        self.l_name_ent = Entry(self.edit_frm, bg=self.whitecolor, width=21, border=0, font=self.font2,
+                            fg=self.darkgreencolor)
+        self.l_name_ent.insert(0, self.l_name.title())
+        self.l_name_ent.grid(row=2, column=2)
+        Label(self.edit_frm, text="E M A I L  A D D R E S S", font=self.font2, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=3, pady=(5, 0), column=0, sticky=W)
+        Label(self.edit_frm, image=self.entryimg4, bg=self.lightgreycolor).grid(row=4, column=0, columnspan=2, sticky=W)
+        self.email_ent = Entry(self.edit_frm, bg=self.whitecolor, width=30, border=0, font=self.font2,
+                           fg=self.darkgreencolor)
+        self.email_ent.insert(0, self.email)
+        self.email_ent.grid(row=4, column=0, columnspan=2, sticky=W, padx=(5, 0))
+        Label(self.edit_frm, text="P H O N E  N U M B E R", font=self.font2, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=5, pady=(5, 0), column=0, sticky=W)
+        Label(self.edit_frm, image=self.entryimg4, bg=self.lightgreycolor).grid(row=6, column=0, columnspan=2, sticky=W)
+        self.phone_ent = Entry(self.edit_frm, bg=self.whitecolor, width=30, border=0, font=self.font2,
+                           fg=self.darkgreencolor)
+        self.phone_ent.insert(0, self.phone_num)
+        self.phone_ent.grid(row=6, column=0, columnspan=2, sticky=W, padx=(5, 0))
+        Label(self.edit_frm, text="N E W  P A S S W O R D", font=self.font2, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(pady=(5, 0),
+                                       row=7, column=0, columnspan=2, sticky=W)
+        Label(self.edit_frm, image=self.entryimg4, bg=self.lightgreycolor).grid(row=8, column=0, columnspan=2, sticky=W)
+        self.newpass_ent = Entry(self.edit_frm, bg=self.whitecolor, show='•', width=26, border=0, font=self.font2,
+                                  fg=self.darkgreencolor)
+        self.newpass_ent.grid(row=8, column=0, padx=(5, 0), columnspan=2, sticky=W)
+        Label(self.edit_frm, text="O L D  P A S S W O R D", font=self.font2, bg=self.lightgreycolor, fg=self.bluecolor).grid(
+            row=9, column=0, sticky=W, pady=(5, 0))
+        Label(self.edit_frm, image=self.entryimg4, bg=self.lightgreycolor).grid(row=10, column=0, columnspan=2, sticky=W)
+        self.toggle_btn = Button(self.edit_frm, image=self.toggle_btn_img, border=0, cursor='hand2',bg=self.whitecolor,
+                                  command=lambda: self.toggle_password(self.newpass_ent, self.toggle_btn))
+        self.toggle_btn.grid(row=8, column=1, padx=(60, 0), sticky=W)
+        self.password_ent = Entry(self.edit_frm, bg=self.whitecolor, show='•', width=26, border=0, font=self.font2,
+                                  fg=self.darkgreencolor)
+        self.password_ent.grid(row=10, column=0, padx=(5, 0), columnspan=2, sticky=W)
+        self.toggle_btn2 = Button(self.edit_frm, image=self.toggle_btn_img, border=0, cursor='hand2',
+                                  bg=self.whitecolor,
+                                  command=lambda: self.toggle_password(self.password_ent, self.toggle_btn2))
+        self.toggle_btn2.grid(row=10, column=1, padx=(60, 0), sticky=W)
+        Button(self.edit_frm, text='S U B M I T', font=self.font2, fg=self.whitecolor, padx=33, border=0,cursor='hand2',bg=self.greencolor,
+               command=lambda: self.page_switcher(0)).grid(row=11, column=2, padx=(5, 0), sticky=W)
+        Label(self.edit_page, image=self.premium, bg=self.lightgreycolor).grid(row=2, column=0,padx=30, sticky=W)
 
 
 
@@ -429,7 +561,7 @@ class LandingPage(Frame):
         self.page_count = 1
         self.person_lbl.config(text=f'PERSON {self.page_count}')
         self.show_passform(int(num))
-        self.class_btns_action('REGULAR COACH')
+        self.class_btns_action('FIRST CLASS')
 
     def class_btns_action(self,n):
         if n=='REGULAR COACH':
@@ -437,32 +569,52 @@ class LandingPage(Frame):
             self.singleprice_lbl.config(text=f'{n}: N{self.regular_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.regular_price} x {self.numvar.get()} = N{self.regular_price*int(self.numvar.get())}.00')
+            self.pay_btn.config(text=f'PAY N{self.regular_price*int(self.numvar.get())}.00')
         elif n=='BUSINESS CLASS':
             self.class_lbl.config(text=f'{n} (40 seater)')
             self.singleprice_lbl.config(text=f'{n}: N{self.business_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.business_price} x {self.numvar.get()} = N{self.business_price * int(self.numvar.get())}.00')
+            self.pay_btn.config(text=f'PAY N{self.business_price*int(self.numvar.get())}.00')
         elif n=='FIRST CLASS':
             self.class_lbl.config(text=f'{n} (24 seater)')
             self.singleprice_lbl.config(text=f'{n}: N{self.firstclass_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.firstclass_price} x {self.numvar.get()} = N{self.firstclass_price * int(self.numvar.get())}.00')
+            self.pay_btn.config(text=f'PAY N{self.firstclass_price*int(self.numvar.get())}.00')
+        else:
+            pass
 
-    def continue_btn_action(self):
-        self.master.configure(bg=self.whitecolor)
-        self.landing_page.grid_forget()
-        self.bookpage.grid(row=1,column=0,sticky=NW)
+    def page_switcher(self,n):
+        pages=[self.landing_page,self.book_page,self.payment_page,self.edit_page]
+        colors=[self.bluecolor,self.whitecolor,self.lightgreycolor,self.lightgreycolor]
+        for i in range(len(pages)):
+            pages[i].grid_forget()
+        pages[n].grid(row=1,column=0,sticky=NW)
+        self.master.configure(bg=colors[n])
 
-    def show_landing_page(self):
-        self.master.configure(bg=self.bluecolor)
-        self.bookpage.grid_forget()
-        self.landing_page.grid(row=1,column=0,sticky=NW)
+    def mainmenu_action(self,item):
+        if item=='PROFILE':
+            self.page_switcher(3)
+        elif item=='TICKETS':
+            self.page_switcher(3)
+        elif item== 'LOGOUT':
+            self.master.destroy()
+
 
     def on_enter(self,event):
         self.continue_btn.config(fg=self.whitecolor)
 
     def on_leave(self,event):
         self.continue_btn.config(fg=self.greencolor)
+
+    def toggle_password(self,widget,toggle_btn):
+        if widget.cget('show') == '':
+            widget.config(show='•')
+            toggle_btn.config(image=self.toggle_btn_img)
+        else:
+            widget.config(show='')
+            toggle_btn.config(image=self.toggle_btn_img2)
 
 
 

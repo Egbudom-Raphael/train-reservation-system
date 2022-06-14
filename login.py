@@ -5,6 +5,7 @@ import random
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk, Image
+import funtions as fn
 
 
 class LandingPage(Frame):
@@ -68,7 +69,7 @@ class LandingPage(Frame):
         self.toggle_btn.grid(row=4,column=1,sticky=W)
         Label(self.login_frm, image=self.login_btn, bg=self.bluecolor).grid(row=5, column=0,sticky=W,pady=30)
         Button(self.login_frm, text='L O G I N',font=self.font2,fg=self.bluecolor,padx=38, border=0, cursor='hand2',
-               bg=self.greencolor).grid(row=5,column=0,sticky=W,pady=30,padx=5)
+               bg=self.greencolor,command=self.login_action).grid(row=5,column=0,sticky=W,pady=30,padx=5)
         Label(self.login_frm, text="DON'T HAVE AN ACCOUNT?", font=self.font2, bg=self.bluecolor, fg=self.whitecolor).grid(row=6, column=0, sticky=W)
         self.signup_btn=Label(self.login_frm, text="SIGN UP", font=self.font5,cursor='hand2', bg=self.bluecolor, fg=self.greencolor)
         self.signup_btn.grid(row=6, column=0,columnspan=2, sticky=E)
@@ -128,7 +129,8 @@ class LandingPage(Frame):
         self.phone = Entry(self.signup_frm, bg=self.whitecolor, width=30, border=0, font=self.font2,
                               fg=self.blackcolor)
         self.phone.grid(row=6, column=0, columnspan=2,sticky=W,padx=(5,0))
-        Label(self.signup_frm, text="U S E R N A M E (max 10 characters)", font=self.font2, bg=self.bluecolor, fg=self.greencolor).grid(pady=(5,0),
+        Label(self.signup_frm, text="U S E R N A M E (cannot be changed later)", font=self.font2,
+              bg=self.bluecolor, fg=self.greencolor).grid(pady=(5,0),
             row=7, column=0,columnspan=2, sticky=W)
         Label(self.signup_frm, image=self.entryimg, bg=self.bluecolor).grid(row=8, column=0, columnspan=2,sticky=W)
         self.username_ent = Entry(self.signup_frm, bg=self.whitecolor, width=30, border=0, font=self.font2,
@@ -145,7 +147,7 @@ class LandingPage(Frame):
         self.toggle_btn2.grid(row=10,column=1,padx=(60,0),sticky=W)
         Label(self.signup_frm, image=self.login_btn, bg=self.bluecolor).grid(row=10, column=2, sticky=W)
         Button(self.signup_frm, text='S U B M I T', font=self.font2, fg=self.bluecolor, padx=33, border=0, cursor='hand2',
-               bg=self.greencolor).grid(row=10, column=2,padx=(5,0), sticky=W)
+               bg=self.greencolor,command=self.signup_action).grid(row=10, column=2,padx=(5,0), sticky=W)
         Label(self.signup_frm, image=self.trainimg2, bg=self.bluecolor).grid(row=6, column=2, sticky=N,columnspan=2,rowspan=4)
 
 
@@ -193,6 +195,66 @@ class LandingPage(Frame):
         else:
             widget.config(show='')
             toggle_btn.config(image=self.toggle_btn_img2)
+
+    def login_action(self):
+        check=fn.login_validate(self.username.get().lower(),self.password.get().lower())
+        if check:
+            self.reset(0)
+            messagebox.showinfo('Login Successful',f'Welcome {check[0][3].title()}')
+        else:
+            messagebox.showerror('Login Failed','Invalid username or password')
+
+    def signup_action(self):
+        fname=self.f_name.get().lower()
+        mname=self.m_name.get().lower()
+        lname=self.l_name.get().lower()
+        user=self.username_ent.get().lower()
+        mail=self.email.get().lower()
+        phone=self.phone.get().lower()
+        password=self.password_ent.get().lower()
+        data=[(user,lname,mname,fname,mail,phone,password)]
+        if fname!='' and mname!='' and lname!='' and user!='' and mail!='' and phone!='' and password!='':
+            if not fn.check_name(fname):
+                messagebox.showerror('ERROR', 'invalid first name')
+            elif not fn.check_name(mname):
+                messagebox.showerror('ERROR', 'invalid middle name')
+            elif not fn.check_name(fname):
+                messagebox.showerror('ERROR', 'invalid last name')
+            elif not fn.check_email(mail):
+                messagebox.showerror('ERROR', 'invalid Email address')
+            elif not fn.check_phone(phone):
+                messagebox.showerror('ERROR', 'invalid phone number')
+            elif not fn.check_name(user):
+                messagebox.showerror('ERROR', 'invalid username')
+            elif fn.check_username_exists(user):
+                messagebox.showerror('ERROR', 'username taken')
+            elif fn.check_email_exists(mail):
+                messagebox.showerror('ERROR', 'email already exists')
+            elif fn.check_phone_exists(phone):
+                messagebox.showerror('ERROR', 'phone number already exists')
+            elif not fn.check_pass(password):
+                messagebox.showerror('ERROR','INVALID PASSWORD')
+            else:
+                fn.register_customer(data)
+                messagebox.showinfo('SUCCESS','Sign up success, proceed to login')
+                self.reset(1)
+                self.go_back()
+
+        else:
+            messagebox.showerror('ERROR','ALL FIELDS ARE REQUIRED')
+
+    def reset(self,n):
+        if n==0:
+            self.username.delete(0,END)
+            self.password.delete(0,END)
+        else:
+            self.f_name.delete(0,END)
+            self.m_name.delete(0,END)
+            self.l_name.delete(0,END)
+            self.username_ent.delete(0,END)
+            self.email.delete(0,END)
+            self.phone.delete(0,END)
+            self.password_ent.delete(0,END)
 
 
 
