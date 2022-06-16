@@ -24,6 +24,7 @@ class LandingPage(Frame):
         self.font6 = f.Font(family='Yu Gothic UI Light', size=13, weight='normal',underline=True)
 
         self.blackcolor = '#080808'
+        self.redcolor = '#E50914'
         self.darkredcolor='#ED4B3A'
         self.bluecolor = "#110445"
         self.greycolor = '#242124'
@@ -55,6 +56,8 @@ class LandingPage(Frame):
         self.menuvar=StringVar()
         self.numvar=IntVar()
         self.childvar=StringVar()
+        self.gendervar=StringVar()
+        self.gend='male'
         self.date = dt.datetime.now()
         self.maxdate=self.date+relativedelta(years=0,months=6,days=0)
         self.slide=0
@@ -194,7 +197,7 @@ class LandingPage(Frame):
         self.to.grid(row=4,column=0,sticky=NW,padx=27)
         self.to_btn = Menubutton(self.dest_frm,cursor='hand2', image=self.down, relief="flat")
         self.to_btn.grid(row=4, column=0,padx=(270,0),sticky=NW)
-        Button(self.dest_frm, image=self.switch, border=0,cursor='hand2', bg=self.lightgreycolor).grid(row=2, column=1,rowspan=3,pady=(15,0),sticky=NW)
+        # Button(self.dest_frm, image=self.switch, border=0,cursor='hand2', bg=self.lightgreycolor).grid(row=2, column=1,rowspan=3,pady=(15,0),sticky=NW)
         self.dest_next=Button(self.dest_frm, image=self.next_img, border=0,cursor='hand2', bg=self.whitecolor,command=lambda: self.cmd(1))
         self.dest_next.grid(row=5, column=0,sticky=NW)
         
@@ -363,7 +366,8 @@ class LandingPage(Frame):
                                   cursor='hand2',fg=self.darkgreencolor,font=self.font2)
         self.remember.grid(row=10,column=0,pady=(5,0),sticky=NW)
         self.remember.select()
-        self.pay_btn=Button(self.payment_frm,text='Pay',font=self.font2,width=17,fg=self.whitecolor,bg=self.greencolor,cursor='hand2',border=0)
+        self.pay_btn=Button(self.payment_frm,text='Pay',font=self.font2,width=17,fg=self.whitecolor,bg=self.greencolor,
+                            cursor='hand2',border=0,command=lambda : self.page_switcher(4))
         self.pay_btn.grid(row=11,column=0,pady=(5,0),padx=(170,0),sticky=W)
         Label(self.payment_page, image=self.premium, bg=self.lightgreycolor).grid(row=1, column=1,sticky=W,pady=(0,60),padx=(80,0))
         self.where.bind("<Button-1>", lambda e: self.cmd(0))
@@ -410,6 +414,19 @@ class LandingPage(Frame):
                            fg=self.darkgreencolor)
         self.email_ent.insert(0, self.email)
         self.email_ent.grid(row=4, column=0, columnspan=2, sticky=W, padx=(5, 0))
+
+        menuitems = ['MALE', 'FEMALE', 'OTHER']
+        self.gender = Menubutton(self.edit_frm, text=menuitems[0], compound=RIGHT, image=self.down,
+                                 border=0, font=self.font2, fg=self.bluecolor, cursor='hand2', bg=self.whitecolor)
+        self.gender.grid(row=4, column=2, sticky=NW, padx=5)
+
+        self.gender.menu = Menu(self.gender, tearoff=0)
+        self.gender['menu'] = self.gender.menu
+        for i in range(len(menuitems)):
+            self.gender.menu.add_radiobutton(label=menuitems[i], value=menuitems[i], variable=self.gendervar,
+                                             command=lambda: self.gender_btn_action(self.gendervar.get()),
+                                             font=self.font2)
+
         Label(self.edit_frm, text="P H O N E  N U M B E R", font=self.font2, bg=self.lightgreycolor,
               fg=self.bluecolor).grid(row=5, pady=(5, 0), column=0, sticky=W)
         Label(self.edit_frm, image=self.entryimg4, bg=self.lightgreycolor).grid(row=6, column=0, columnspan=2, sticky=W)
@@ -442,9 +459,71 @@ class LandingPage(Frame):
         Label(self.edit_page, image=self.premium, bg=self.lightgreycolor).grid(row=2, column=0,padx=30, sticky=W)
 
 
+        self.seat_selection_page = Frame(self.master, bg=self.lightgreycolor)
+        # self.seat_selection_page.grid(row=1, column=0, sticky=NW)
+        # self.master.configure(bg=self.lightgreycolor)
+        # Button(self.seat_selection_page, image=self.back_img, border=0, cursor='hand2', command=lambda: self.page_switcher(1),
+        #        bg=self.lightgreycolor).grid(row=1, column=0, sticky=NW, pady=15, padx=(20, 0))
+        Label(self.seat_selection_page, text="SELECT SEAT", font=self.font1, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=0, column=0, sticky=NW, pady=10,padx=30)
+        Label(self.seat_selection_page,image=self.availble,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1, column=1, sticky=NW, pady=5, padx=(10,10))
+        Label(self.seat_selection_page, text="AVAILABLE", font=self.font2, bg=self.lightgreycolor,
+              fg=self.bluecolor).grid(row=1, column=1, sticky=NW, pady=5, padx=(40,0))
+        Label(self.seat_selection_page,image=self.selected,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1, column=2, sticky=NW, pady=5, padx=10)
+        Label(self.seat_selection_page, text="SELECTED", font=self.font2, bg=self.lightgreycolor,
+              fg=self.greencolor).grid(row=1, column=2, sticky=NW, pady=5, padx=(40,0))
+        Label(self.seat_selection_page,image=self.unavailable,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1, column=3, sticky=NW, pady=5, padx=10)
+        Label(self.seat_selection_page, text="UNAVAILABLE", font=self.font2, bg=self.lightgreycolor,
+              fg=self.darkredcolor).grid(row=1, column=3, sticky=NW, pady=5, padx=(40,0))
+        self.seat_class_lbl = Label(self.seat_selection_page, text='FIRST CLASS (24 SEATER)',font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor)
+        self.seat_class_lbl.grid(row=2, column=1,columnspan=2, sticky=NW, pady=(20,10),padx=(10))
+        self.seat_frm=Frame(self.seat_selection_page, bg=self.lightgreycolor)
+        self.seat_frm.grid(row=3, column=1,columnspan=3,rowspan=2,padx=10, sticky=NW)
+        self.seat_placement()
+        Button(self.seat_selection_page, text='P R O C E E D', font=self.font2, fg=self.whitecolor, padx=10, border=0,
+               cursor='hand2', bg=self.greencolor).grid(row=5, column=3,pady=20, sticky=NE)
 
+        self.saved = []
         self.way_count=False
         self.page_count=1
+
+    def seat_placement(self):
+        count=1
+        z=[1,3,6,8,9,15,33,25]
+        for x in range(1,13):
+            for y in range(20//12):
+                if count in z:
+                    b = Button(self.seat_frm, image=self.unavailable, border=0, bg=self.lightgreycolor,
+                               name='fc-%d' % count,
+                               cursor='hand2',state='disabled' ,command=lambda x=count: self.get_seat_num(x))
+                    # b.config(state='disabled')
+                    b.grid(row=y, column=x, padx=5, pady=5)
+                    count += 1
+                else:
+                    b=Button(self.seat_frm,image=self.availble,border=0,bg=self.lightgreycolor,name='fc-%d' % count,
+                             cursor='hand2',command=lambda x=count:self.get_seat_num(x))
+                    b.grid(row=y,column=x,padx=5,pady=5)
+                    count+=1
+
+
+
+    def get_seat_num(self,numb):
+        for k,v in self.seat_frm.children.items():
+            if k=='fc-%d'% numb:
+                if len(self.saved)<self.numvar.get():
+                    if v._name in self.saved:
+                        v.config(image=self.availble)
+                        self.saved.remove(v._name)
+                        print(self.saved)
+                    else:
+                        v.config(image=self.selected)
+                        self.saved.append(v._name)
+                        print(self.saved)
+                else:
+                    messagebox.showerror('ERROR','max seats reached')
+            # print(v._name)
+
+
 
     def travellerdata(self,n):
         self.entry = [[Entry() for row in range(6)] for col in range(n)]
@@ -484,11 +563,13 @@ class LandingPage(Frame):
                         self.entry[col][row] = Entry(self.pass_details, font=self.font5, bg=self.lightgreycolor,
                                            fg=self.darkgreencolor,
                                            border=0, width=35)
+                        self.entry[col][row].insert(0, self.email.upper())
 
                     elif row == 2:
                         self.entry[col][row] = Entry(self.pass_details, font=self.font5, bg=self.lightgreycolor,
                                            fg=self.darkgreencolor,
                                            border=0, width=35)
+                        self.entry[col][row].insert(0, self.phone_num)
 
 
     def next_form(self):
@@ -566,18 +647,21 @@ class LandingPage(Frame):
     def class_btns_action(self,n):
         if n=='REGULAR COACH':
             self.class_lbl.config(text=f'{n} (88 seater)')
+            self.seat_class_lbl.config(text=f'{n} (88 seater)')
             self.singleprice_lbl.config(text=f'{n}: N{self.regular_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.regular_price} x {self.numvar.get()} = N{self.regular_price*int(self.numvar.get())}.00')
             self.pay_btn.config(text=f'PAY N{self.regular_price*int(self.numvar.get())}.00')
         elif n=='BUSINESS CLASS':
             self.class_lbl.config(text=f'{n} (40 seater)')
+            self.seat_class_lbl.config(text=f'{n} (40 seater)')
             self.singleprice_lbl.config(text=f'{n}: N{self.business_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.business_price} x {self.numvar.get()} = N{self.business_price * int(self.numvar.get())}.00')
             self.pay_btn.config(text=f'PAY N{self.business_price*int(self.numvar.get())}.00')
         elif n=='FIRST CLASS':
             self.class_lbl.config(text=f'{n} (24 seater)')
+            self.seat_class_lbl.config(text=f'{n} (24 seater)')
             self.singleprice_lbl.config(text=f'{n}: N{self.firstclass_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.firstclass_price} x {self.numvar.get()} = N{self.firstclass_price * int(self.numvar.get())}.00')
@@ -586,8 +670,8 @@ class LandingPage(Frame):
             pass
 
     def page_switcher(self,n):
-        pages=[self.landing_page,self.book_page,self.payment_page,self.edit_page]
-        colors=[self.bluecolor,self.whitecolor,self.lightgreycolor,self.lightgreycolor]
+        pages=[self.landing_page,self.book_page,self.payment_page,self.edit_page,self.seat_selection_page]
+        colors=[self.bluecolor,self.whitecolor,self.lightgreycolor,self.lightgreycolor,self.lightgreycolor]
         for i in range(len(pages)):
             pages[i].grid_forget()
         pages[n].grid(row=1,column=0,sticky=NW)
@@ -616,6 +700,9 @@ class LandingPage(Frame):
             widget.config(show='')
             toggle_btn.config(image=self.toggle_btn_img2)
 
+    def gender_btn_action(self,gend):
+        self.gender.config(text=gend)
+        self.gend=gend.lower()
 
 
 

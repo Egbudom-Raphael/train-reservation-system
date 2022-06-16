@@ -63,15 +63,22 @@ def login_validate(username,password):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM customer_info WHERE username=? and password=?", [(username),(password)])
     validate = cursor.fetchall()
+    cursor.execute("SELECT * FROM customer_info WHERE email=? and password=?", [(username),(password)])
+    validate2=cursor.fetchall()
     conn.close()
-    return validate
+    if validate:
+        return validate
+    elif validate2:
+        return validate2
+    else:
+        return False
 
 
 def register_customer(data):
     # cost=list(data)
     conn = sqlite3.connect('railly.db')
     c = conn.cursor()
-    c.executemany("INSERT INTO customer_info(username, lastname, middlename, firstname, email, phonenumber, password) VALUES(?,?,?,?,?,?,?)", data)
+    c.executemany("INSERT INTO customer_info(username, lastname, middlename, firstname,gender, email, phonenumber, password,type) VALUES(?,?,?,?,?,?,?,?,?)", data)
     conn.commit()
     conn.close()
 

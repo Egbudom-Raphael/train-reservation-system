@@ -27,7 +27,8 @@ class LandingPage(Frame):
         self.whitecolor = 'white'
         self.darkgreycolor = '#221F1F'
         self.lightgreycolor = '#8B8D97'
-
+        self.gendervar=StringVar()
+        self.gend='male'
         self.slide=0
         self.create_widgets()
         self.slideshow()
@@ -46,6 +47,8 @@ class LandingPage(Frame):
         self.qrcodeimg=ImageTk.PhotoImage(Image.open("QR-Code-01-128.png"))
         self.test = ImageTk.PhotoImage(Image.open("regular.png"))
         self.trainimg2=ImageTk.PhotoImage(Image.open("point1.png").resize((128,128)))
+        self.down=ImageTk.PhotoImage(Image.open("drop down button.png"))
+
 
         self.logo=Label(self.master,image=self.img,bg=self.bluecolor)
         self.logo.grid(row=0,column=0,padx=5,pady=(5,0),sticky=NW)
@@ -55,7 +58,7 @@ class LandingPage(Frame):
         self.login_frm.grid(row=1,column=1,padx=5,sticky=NW)
         Label(self.login_frm, text="L O G I N", font=self.font1, bg=self.bluecolor,
               fg=self.whitecolor).grid(row=0,column=0,sticky=W,pady=(0,20))
-        Label(self.login_frm,text="U S E R N A M E",font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=1,column=0,sticky=W)
+        Label(self.login_frm,text="E M A I L   O R   U S E R N A M E  ",font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=1,column=0,sticky=W)
         label2=Label(self.login_frm,image=self.entryimg,bg=self.bluecolor)
         label2.grid(row=2,column=0,columnspan=2)
         self.username=Entry(self.login_frm,bg=self.whitecolor,width=30,border=0,font=self.font2,fg=self.blackcolor)
@@ -123,6 +126,19 @@ class LandingPage(Frame):
         self.email = Entry(self.signup_frm, bg=self.whitecolor, width=30, border=0, font=self.font2,
                               fg=self.blackcolor)
         self.email.grid(row=4, column=0, columnspan=2,sticky=W,padx=(5,0))
+
+        # Label(self.signup_frm, image=self.entryimg2, bg=self.bluecolor).grid(row=4, column=2,sticky=NW)
+        menuitems = ['MALE','FEMALE','OTHER']
+        self.gender = Menubutton(self.signup_frm, text=menuitems[0], compound=RIGHT, image=self.down,
+                                   border=0, font=self.font2, fg=self.bluecolor, cursor='hand2', bg=self.whitecolor)
+        self.gender.grid(row=4, column=2,sticky=NW,padx=5)
+
+        self.gender.menu = Menu(self.gender, tearoff=0)
+        self.gender['menu'] = self.gender.menu
+        for i in range(len(menuitems)):
+            self.gender.menu.add_radiobutton(label=menuitems[i], value=menuitems[i], variable=self.gendervar,
+                                               command=lambda: self.gender_btn_action(self.gendervar.get()),
+                                               font=self.font2)
         Label(self.signup_frm, text="P H O N E  N U M B E R", font=self.font2, bg=self.bluecolor, fg=self.greencolor).grid(
             row=5,pady=(5,0), column=0, sticky=W)
         Label(self.signup_frm, image=self.entryimg, bg=self.bluecolor).grid(row=6, column=0, columnspan=2,sticky=W)
@@ -199,6 +215,7 @@ class LandingPage(Frame):
     def login_action(self):
         check=fn.login_validate(self.username.get().lower(),self.password.get().lower())
         if check:
+            print(check)
             self.reset(0)
             messagebox.showinfo('Login Successful',f'Welcome {check[0][3].title()}')
         else:
@@ -209,10 +226,12 @@ class LandingPage(Frame):
         mname=self.m_name.get().lower()
         lname=self.l_name.get().lower()
         user=self.username_ent.get().lower()
+        gend=self.gend.lower()
+        type=0
         mail=self.email.get().lower()
         phone=self.phone.get().lower()
         password=self.password_ent.get().lower()
-        data=[(user,lname,mname,fname,mail,phone,password)]
+        data=[(user,lname,mname,fname,gend,mail,phone,password,type)]
         if fname!='' and mname!='' and lname!='' and user!='' and mail!='' and phone!='' and password!='':
             if not fn.check_name(fname):
                 messagebox.showerror('ERROR', 'invalid first name')
@@ -237,6 +256,7 @@ class LandingPage(Frame):
             else:
                 fn.register_customer(data)
                 messagebox.showinfo('SUCCESS','Sign up success, proceed to login')
+                self.username.insert(0,user)
                 self.reset(1)
                 self.go_back()
 
@@ -256,8 +276,9 @@ class LandingPage(Frame):
             self.phone.delete(0,END)
             self.password_ent.delete(0,END)
 
-
-
+    def gender_btn_action(self,gend):
+        self.gender.config(text=gend)
+        self.gend=gend.lower()
 
 
 
