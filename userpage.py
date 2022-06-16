@@ -510,17 +510,18 @@ class LandingPage(Frame):
     def get_seat_num(self,numb):
         for k,v in self.seat_frm.children.items():
             if k=='fc-%d'% numb:
-                if len(self.saved)<self.numvar.get():
-                    if v._name in self.saved:
-                        v.config(image=self.availble)
-                        self.saved.remove(v._name)
-                        print(self.saved)
-                    else:
+                if v._name in self.saved:
+                    v.config(image=self.availble)
+                    self.saved.remove(v._name)
+                    print(self.saved)
+                else:
+                    if len(self.saved) < self.numvar.get():
                         v.config(image=self.selected)
                         self.saved.append(v._name)
                         print(self.saved)
-                else:
-                    messagebox.showerror('ERROR','max seats reached')
+                    else:
+                        messagebox.showerror('ERROR', 'max seats reached')
+
             # print(v._name)
 
 
