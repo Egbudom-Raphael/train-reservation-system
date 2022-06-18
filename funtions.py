@@ -83,3 +83,41 @@ def register_customer(data):
     conn.close()
 
 
+#++++++++++++++++++++++++++++++++++++++++++++++booking functions++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+def get_sources():
+    conn = sqlite3.connect('railly.db')
+    c = conn.cursor()
+    sources=set(c.execute("SELECT dep_location FROM schedule").fetchall())
+    conn.commit()
+    conn.close()
+    source_list=[]
+    for i in sources:
+        source_list.append(i[0])
+    return source_list
+
+def get_destinations(source):
+    conn = sqlite3.connect('railly.db')
+    c = conn.cursor()
+    dest = set(c.execute("SELECT arr_location FROM schedule WHERE dep_location=?",(source,)).fetchall())
+    conn.commit()
+    conn.close()
+    dest_list=[]
+    for i in dest:
+        dest_list.append(i[0])
+    return dest_list
+
+def get_time(source,dest):
+    conn = sqlite3.connect('railly.db')
+    c = conn.cursor()
+    time = set(c.execute("SELECT time FROM schedule WHERE dep_location=? and arr_location=?",(source,dest,)).fetchall())
+    conn.commit()
+    conn.close()
+    time_list=[]
+    for i in time:
+        time_list.append(i[0])
+    return time_list
+
+
+
+
+

@@ -8,6 +8,7 @@ import random
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk, Image
+import funtions as fn
 
 
 class LandingPage(Frame):
@@ -53,13 +54,25 @@ class LandingPage(Frame):
         self.regular_price=2000
         self.business_price=self.regular_price*2
         self.firstclass_price=self.regular_price*3
+        self.source=fn.get_sources()
+        # self.destination=['Obafemi Awolowo Station','Samuel Ladoke Akintola Station','Wole Soyinka Station',
+        #                   'Babatunde Raji Fashola Station','Mobolaji Johnson Station']
+        self.sourcevar=StringVar()
+        self.destinationvar=StringVar()
+        self.go_time=['8:00','10:00','12:00','14:00','16:30']
+        self.return_time=['9:00','11:00','13:00','15:00','18:30']
+        self.go_timevar=StringVar()
+        self.return_timevar=StringVar()
         self.menuvar=StringVar()
         self.numvar=IntVar()
+        self.classval='first class'
         self.childvar=StringVar()
         self.gendervar=StringVar()
         self.gend='male'
+        self.sourcedate=[]
+        self.return_date=[]
         self.date = dt.datetime.now()
-        self.maxdate=self.date+relativedelta(years=0,months=6,days=0)
+        self.maxdate=self.date+relativedelta(years=0,months=2,days=0)
         self.slide=0
         self.create_widgets()
 
@@ -190,14 +203,19 @@ class LandingPage(Frame):
         self.fro=Label(self.dest_frm,text='Select Station',font=self.font2,bg=self.lightgreycolor,fg=self.darkgreencolor)
         self.fro.grid(row=2,column=0,sticky=NW,padx=27)
         self.fro_btn = Menubutton(self.dest_frm,cursor='hand2', image=self.down, relief="flat")
-        self.fro_btn.grid(row=2, column=0,padx=(270,0),sticky=NW)
+        self.fro_btn.grid(row=2, column=1,sticky=NW)
+        self.fro_btn.menu = Menu(self.fro_btn, tearoff=0)
+        self.fro_btn['menu'] = self.fro_btn.menu
+        for i in range(len(self.source)):
+            self.fro_btn.menu.add_radiobutton(label=self.source[i], value=self.source[i], variable=self.sourcevar,
+                                               command=lambda: self.from_action(self.sourcevar.get()),
+                                               font=self.font2)
         Label(self.dest_frm, image=self.entrybg, bg=self.whitecolor).grid(row=3, column=0,rowspan=2,pady=15,sticky=NW,columnspan=2)
         Label(self.dest_frm, text='TO', font=self.font2, padx=20,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=3, column=0, sticky=W,pady=(8,0),padx=9)
         self.to=Label(self.dest_frm,text='Select Station',font=self.font2,bg=self.lightgreycolor,fg=self.darkgreencolor)
         self.to.grid(row=4,column=0,sticky=NW,padx=27)
         self.to_btn = Menubutton(self.dest_frm,cursor='hand2', image=self.down, relief="flat")
-        self.to_btn.grid(row=4, column=0,padx=(270,0),sticky=NW)
-        # Button(self.dest_frm, image=self.switch, border=0,cursor='hand2', bg=self.lightgreycolor).grid(row=2, column=1,rowspan=3,pady=(15,0),sticky=NW)
+        self.to_btn.grid(row=4, column=1,sticky=NW)
         self.dest_next=Button(self.dest_frm, image=self.next_img, border=0,cursor='hand2', bg=self.whitecolor,command=lambda: self.cmd(1))
         self.dest_next.grid(row=5, column=0,sticky=NW)
         
@@ -218,14 +236,16 @@ class LandingPage(Frame):
                              year=dt.date.today().year)
         self.selectdate['state'] = 'readonly'
         self.selectdate.grid(row=2, column=0,padx=(27,0),sticky=NW)
-
+        self.selectdate.bind("<<DateEntrySelected>>",lambda e: self.get_go_time())
         self.to_lbl=Label(self.date_frm, text='TO', font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor)
+
         # self.to_lbl.grid(row=2, column=0, sticky=NW, padx=(160,0))
 
         self.returndate = DateEntry(self.date_frm, selectmode='day',mindate=self.date,maxdate=self.maxdate, cursor='hand2', font=self.font2,
                              year=dt.date.today().year)
         self.returndate['state'] = 'readonly'
         # self.returndate.grid(row=2, column=0,padx=(190,0),sticky=NW)
+        self.returndate.bind("<<DateEntrySelected>>",lambda e: self.get_return_time())
 
         Label(self.date_frm, image=self.entrybg, bg=self.whitecolor).grid(row=3, column=0, rowspan=2, pady=15,
                                                                           sticky=NW, columnspan=2)
@@ -237,9 +257,22 @@ class LandingPage(Frame):
         self.go_time_btn = Menubutton(self.date_frm,text='GOING',font=self.font2,fg=self.bluecolor,bg=self.lightgreycolor,
                                       compound=RIGHT,cursor='hand2', image=self.down, relief="flat")
         self.go_time_btn.grid(row=4, column=0, padx=(27, 0), sticky=NW,pady=(0, 2))
+        # self.go_time_btn.menu = Menu(self.go_time_btn, tearoff=0)
+        # self.go_time_btn['menu'] = self.go_time_btn.menu
+        # for i in range(len(self.go_time)):
+        #     self.go_time_btn.menu.add_radiobutton(label=self.go_time[i], value=self.go_time[i], variable=self.go_timevar,
+        #                                       command=lambda: self.from_action(self.go_timevar.get()),
+        #                                       font=self.font2)
         self.return_time_btn = Menubutton(self.date_frm, text='RETURN', font=self.font2, fg=self.bluecolor,
                                           bg=self.lightgreycolor,compound=RIGHT, cursor='hand2', image=self.down, relief="flat")
         # self.return_time_btn.grid(row=4, column=0, padx=(110, 0), sticky=NW)
+        self.return_time_btn.menu = Menu(self.return_time_btn, tearoff=0)
+        self.return_time_btn['menu'] = self.return_time_btn.menu
+        # for i in range(len(self.return_time)):
+        #     self.return_time_btn.menu.add_radiobutton(label=self.return_time[i], value=self.return_time[i],
+        #                                           variable=self.return_timevar,
+        #                                           command=lambda: self.from_action(self.return_timevar.get()),
+        #                                           font=self.font2)
 
         self.date_back=Button(self.date_frm,text='', image=self.backarrow, border=0, cursor='hand2',command=lambda: self.cmd(0),
                bg=self.whitecolor)
@@ -461,25 +494,22 @@ class LandingPage(Frame):
 
         self.seat_selection_page = Frame(self.master, bg=self.lightgreycolor)
         # self.seat_selection_page.grid(row=1, column=0, sticky=NW)
-        # self.master.configure(bg=self.lightgreycolor)
-        # Button(self.seat_selection_page, image=self.back_img, border=0, cursor='hand2', command=lambda: self.page_switcher(1),
-        #        bg=self.lightgreycolor).grid(row=1, column=0, sticky=NW, pady=15, padx=(20, 0))
         Label(self.seat_selection_page, text="SELECT SEAT", font=self.font1, bg=self.lightgreycolor,
-              fg=self.bluecolor).grid(row=0, column=0, sticky=NW, pady=10,padx=30)
-        Label(self.seat_selection_page,image=self.availble,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1, column=1, sticky=NW, pady=5, padx=(10,10))
+              fg=self.bluecolor).grid(row=0, column=0, sticky=NW, pady=(10,0),padx=30)
+        Label(self.seat_selection_page,image=self.availble,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1, column=1, sticky=NW, padx=(10,10))
         Label(self.seat_selection_page, text="AVAILABLE", font=self.font2, bg=self.lightgreycolor,
-              fg=self.bluecolor).grid(row=1, column=1, sticky=NW, pady=5, padx=(40,0))
-        Label(self.seat_selection_page,image=self.selected,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1, column=2, sticky=NW, pady=5, padx=10)
+              fg=self.darkgreencolor).grid(row=1, column=1, sticky=NW, padx=(40,0))
+        Label(self.seat_selection_page,image=self.selected,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1, column=2, sticky=NW, padx=10)
         Label(self.seat_selection_page, text="SELECTED", font=self.font2, bg=self.lightgreycolor,
-              fg=self.greencolor).grid(row=1, column=2, sticky=NW, pady=5, padx=(40,0))
-        Label(self.seat_selection_page,image=self.unavailable,bg=self.lightgreycolor,fg=self.bluecolor).grid(row=1, column=3, sticky=NW, pady=5, padx=10)
+              fg=self.greencolor).grid(row=1, column=2, sticky=NW, padx=(40,0))
+        Label(self.seat_selection_page,image=self.unavailable,bg=self.lightgreycolor,state='disabled',fg=self.bluecolor).grid(row=1, column=3, sticky=NW, padx=10)
         Label(self.seat_selection_page, text="UNAVAILABLE", font=self.font2, bg=self.lightgreycolor,
-              fg=self.darkredcolor).grid(row=1, column=3, sticky=NW, pady=5, padx=(40,0))
+              fg=self.darkredcolor).grid(row=1, column=3, sticky=NW, padx=(40,0))
         self.seat_class_lbl = Label(self.seat_selection_page, text='FIRST CLASS (24 SEATER)',font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor)
-        self.seat_class_lbl.grid(row=2, column=1,columnspan=2, sticky=NW, pady=(20,10),padx=(10))
+        self.seat_class_lbl.grid(row=2, column=1,columnspan=2, sticky=NW, pady=(5,5),padx=(10))
         self.seat_frm=Frame(self.seat_selection_page, bg=self.lightgreycolor)
         self.seat_frm.grid(row=3, column=1,columnspan=3,rowspan=2,padx=10, sticky=NW)
-        self.seat_placement()
+        self.seat_placement('rc',40)
         Button(self.seat_selection_page, text='P R O C E E D', font=self.font2, fg=self.whitecolor, padx=10, border=0,
                cursor='hand2', bg=self.greencolor).grid(row=5, column=3,pady=20, sticky=NE)
 
@@ -487,29 +517,58 @@ class LandingPage(Frame):
         self.way_count=False
         self.page_count=1
 
-    def seat_placement(self):
+    def seat_placement(self,cls,num):
         count=1
-        z=[1,3,6,8,9,15,33,25]
-        for x in range(1,13):
-            for y in range(20//12):
+        # num=54
+        z=[1,3,6,8,23,15,33,25]
+        if num>=12:
+            for x in range(1,13):
+                for y in range(num//12):
+                    if count in z:
+                        b = Button(self.seat_frm, image=self.unavailable, border=0, bg=self.lightgreycolor,
+                                   name='%s-%d' % (cls,count),
+                                   cursor='hand2',state='disabled' ,command=lambda x=count: self.get_seat_num(cls,x))
+                        # b.config(state='disabled')
+                        b.grid(row=y, column=x, padx=5, pady=5)
+                        count += 1
+                    else:
+                        b=Button(self.seat_frm,image=self.availble,border=0,bg=self.lightgreycolor,name='%s-%d' % (cls,count),
+                                 cursor='hand2',command=lambda x=count:self.get_seat_num(cls,x))
+                        b.grid(row=y,column=x,padx=5,pady=5)
+                        count+=1
+            for i in range(1,num%12+1):
                 if count in z:
                     b = Button(self.seat_frm, image=self.unavailable, border=0, bg=self.lightgreycolor,
-                               name='fc-%d' % count,
-                               cursor='hand2',state='disabled' ,command=lambda x=count: self.get_seat_num(x))
+                               name='%s-%d' % (cls,count),
+                               cursor='hand2', state='disabled', command=lambda x=count: self.get_seat_num(cls,x))
                     # b.config(state='disabled')
-                    b.grid(row=y, column=x, padx=5, pady=5)
+                    b.grid(row=y+1, column=i, padx=5, pady=5)
                     count += 1
                 else:
-                    b=Button(self.seat_frm,image=self.availble,border=0,bg=self.lightgreycolor,name='fc-%d' % count,
-                             cursor='hand2',command=lambda x=count:self.get_seat_num(x))
-                    b.grid(row=y,column=x,padx=5,pady=5)
-                    count+=1
+                    b = Button(self.seat_frm, image=self.availble, border=0, bg=self.lightgreycolor, name='%s-%d' % (cls,count),
+                               cursor='hand2', command=lambda x=count: self.get_seat_num(cls,x))
+                    b.grid(row=y+1, column=i, padx=5, pady=5)
+                    count += 1
+        else:
+            for i in range(1,num+1):
+                if count in z:
+                    b = Button(self.seat_frm, image=self.unavailable, border=0, bg=self.lightgreycolor,
+                               name='%s-%d' % (cls,count),
+                               cursor='hand2', state='disabled', command=lambda x=count: self.get_seat_num(cls,x))
+                    # b.config(state='disabled')
+                    b.grid(row=1, column=i, padx=5, pady=5)
+                    count += 1
+                else:
+                    b = Button(self.seat_frm, image=self.availble, border=0, bg=self.lightgreycolor, name='%s-%d' % (cls,count),
+                               cursor='hand2', command=lambda x=count: self.get_seat_num(cls,x))
+                    b.grid(row=1, column=i, padx=5, pady=5)
+                    count += 1
 
 
 
-    def get_seat_num(self,numb):
+    def get_seat_num(self,cls,numb):
         for k,v in self.seat_frm.children.items():
-            if k=='fc-%d'% numb:
+            if k=='%s-%d'% (cls,numb):
                 if v._name in self.saved:
                     v.config(image=self.availble)
                     self.saved.remove(v._name)
@@ -619,7 +678,7 @@ class LandingPage(Frame):
         if self.way_count==False:
             self.to_lbl.grid(row=2, column=0, sticky=NW, padx=(160, 0))
             self.returndate.grid(row=2, column=0, padx=(190, 0), sticky=NW)
-            self.return_time_btn.grid(row=4, column=0, padx=(120, 0), sticky=NW)
+            self.return_time_btn.grid(row=4, column=0, padx=(130, 0), sticky=NW)
             self.way.config(image=self.return_img)
             self.way_count=True
         else:
@@ -653,6 +712,7 @@ class LandingPage(Frame):
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.regular_price} x {self.numvar.get()} = N{self.regular_price*int(self.numvar.get())}.00')
             self.pay_btn.config(text=f'PAY N{self.regular_price*int(self.numvar.get())}.00')
+            self.classval='regular class'
         elif n=='BUSINESS CLASS':
             self.class_lbl.config(text=f'{n} (40 seater)')
             self.seat_class_lbl.config(text=f'{n} (40 seater)')
@@ -660,6 +720,7 @@ class LandingPage(Frame):
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.business_price} x {self.numvar.get()} = N{self.business_price * int(self.numvar.get())}.00')
             self.pay_btn.config(text=f'PAY N{self.business_price*int(self.numvar.get())}.00')
+            self.classval='business class'
         elif n=='FIRST CLASS':
             self.class_lbl.config(text=f'{n} (24 seater)')
             self.seat_class_lbl.config(text=f'{n} (24 seater)')
@@ -667,6 +728,7 @@ class LandingPage(Frame):
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.firstclass_price} x {self.numvar.get()} = N{self.firstclass_price * int(self.numvar.get())}.00')
             self.pay_btn.config(text=f'PAY N{self.firstclass_price*int(self.numvar.get())}.00')
+            self.classval='business class'
         else:
             pass
 
@@ -705,8 +767,52 @@ class LandingPage(Frame):
         self.gender.config(text=gend)
         self.gend=gend.lower()
 
+    def from_action(self, station):
+        self.fro.config(text=station)
+        destination=fn.get_destinations(station)
+        if station in destination:
+            destination.remove(station)
+            self.to_btn.menu = Menu(self.to_btn, tearoff=0)
+            self.to_btn['menu'] = self.to_btn.menu
+            for i in range(len(destination)):
+                self.to_btn.menu.add_radiobutton(label=destination[i], value=destination[i],variable=self.destinationvar,
+                                                 command=lambda: self.to_action(self.destinationvar.get()),
+                                                 font=self.font2)
+            destination.append(station)
+        else:
+            # destination.remove(station)
+            self.to_btn.menu = Menu(self.to_btn, tearoff=0)
+            self.to_btn['menu'] = self.to_btn.menu
+            for i in range(len(destination)):
+                self.to_btn.menu.add_radiobutton(label=destination[i], value=destination[i],
+                                                 variable=self.destinationvar,
+                                                 command=lambda: self.to_action(self.destinationvar.get()),
+                                                 font=self.font2)
+    def to_action(self,station):
+        self.to.config(text=station)
 
-
+    def get_go_time(self):
+        source=self.fro.cget('text')
+        dest=self.to.cget('text')
+        time=fn.get_time(source,dest)
+        self.go_time_btn.menu = Menu(self.go_time_btn, tearoff=0)
+        self.go_time_btn['menu'] = self.go_time_btn.menu
+        for i in range(len(time)):
+            self.go_time_btn.menu.add_radiobutton(label=time[i], value=time[i],
+                                                  variable=self.go_timevar,
+                                                  command=lambda: self.go_time_btn.config(text=self.go_timevar.get()),
+                                                  font=self.font2)
+    def get_return_time(self):
+        source=self.fro.cget('text')
+        dest=self.to.cget('text')
+        time=fn.get_time(dest,source)
+        self.return_time_btn.menu = Menu(self.return_time_btn, tearoff=0)
+        self.return_time_btn['menu'] = self.return_time_btn.menu
+        for i in range(len(time)):
+            self.return_time_btn.menu.add_radiobutton(label=time[i], value=time[i],
+                                                  variable=self.return_timevar,
+                                                  command=lambda: self.return_time_btn.config(text=self.return_timevar.get()),
+                                                  font=self.font2)
 
 
 
