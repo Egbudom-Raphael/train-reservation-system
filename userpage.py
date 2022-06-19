@@ -1,8 +1,10 @@
+import datetime
 from tkinter import *
 from tkinter import font as f
 from tkcalendar import *
 import datetime as dt
 from dateutil.relativedelta import relativedelta
+import time
 from PIL import ImageTk, Image
 import random
 from tkinter import ttk
@@ -75,6 +77,8 @@ class LandingPage(Frame):
         self.maxdate=self.date+relativedelta(years=0,months=2,days=0)
         self.slide=0
         self.create_widgets()
+        # self.class_btns_action('FIRST CLASS')
+
 
     def create_widgets(self):
         self.logo = ImageTk.PhotoImage(Image.open("railly logo green.png"))
@@ -229,14 +233,11 @@ class LandingPage(Frame):
         Label(self.date_frm, image=self.entrybg, bg=self.whitecolor).grid(row=1, column=0, rowspan=2, sticky=NW, columnspan=2)
         Label(self.date_frm, text='DATE', font=self.font2, bg=self.lightgreycolor,
               fg=self.bluecolor).grid(row=1,column=0,sticky=W,pady=(7, 0),padx=27)
-        self.lbl_date = Label(self.date_frm, text=f"{self.date:%A, %B %d, %Y}", bg=self.lightgreycolor, fg=self.darkgreencolor,
-                              font=self.font2)
-        # self.lbl_date.grid(row=2, column=0, sticky=NW, padx=27)
         self.selectdate = DateEntry(self.date_frm, selectmode='day',mindate=self.date,maxdate=self.maxdate, cursor='hand2', font=self.font2,
                              year=dt.date.today().year)
         self.selectdate['state'] = 'readonly'
         self.selectdate.grid(row=2, column=0,padx=(27,0),sticky=NW)
-        self.selectdate.bind("<<DateEntrySelected>>",lambda e: self.get_go_time())
+        self.selectdate.bind("<<DateEntrySelected>>",lambda e: self.get_go_time(self.selectdate.get_date()))
         self.to_lbl=Label(self.date_frm, text='TO', font=self.font2, bg=self.lightgreycolor,fg=self.bluecolor)
 
         # self.to_lbl.grid(row=2, column=0, sticky=NW, padx=(160,0))
@@ -245,7 +246,7 @@ class LandingPage(Frame):
                              year=dt.date.today().year)
         self.returndate['state'] = 'readonly'
         # self.returndate.grid(row=2, column=0,padx=(190,0),sticky=NW)
-        self.returndate.bind("<<DateEntrySelected>>",lambda e: self.get_return_time())
+        self.returndate.bind("<<DateEntrySelected>>",lambda e: self.get_return_time(self.returndate.get_date()))
 
         Label(self.date_frm, image=self.entrybg, bg=self.whitecolor).grid(row=3, column=0, rowspan=2, pady=15,
                                                                           sticky=NW, columnspan=2)
@@ -257,22 +258,12 @@ class LandingPage(Frame):
         self.go_time_btn = Menubutton(self.date_frm,text='GOING',font=self.font2,fg=self.bluecolor,bg=self.lightgreycolor,
                                       compound=RIGHT,cursor='hand2', image=self.down, relief="flat")
         self.go_time_btn.grid(row=4, column=0, padx=(27, 0), sticky=NW,pady=(0, 2))
-        # self.go_time_btn.menu = Menu(self.go_time_btn, tearoff=0)
-        # self.go_time_btn['menu'] = self.go_time_btn.menu
-        # for i in range(len(self.go_time)):
-        #     self.go_time_btn.menu.add_radiobutton(label=self.go_time[i], value=self.go_time[i], variable=self.go_timevar,
-        #                                       command=lambda: self.from_action(self.go_timevar.get()),
-        #                                       font=self.font2)
+
         self.return_time_btn = Menubutton(self.date_frm, text='RETURN', font=self.font2, fg=self.bluecolor,
                                           bg=self.lightgreycolor,compound=RIGHT, cursor='hand2', image=self.down, relief="flat")
         # self.return_time_btn.grid(row=4, column=0, padx=(110, 0), sticky=NW)
         self.return_time_btn.menu = Menu(self.return_time_btn, tearoff=0)
         self.return_time_btn['menu'] = self.return_time_btn.menu
-        # for i in range(len(self.return_time)):
-        #     self.return_time_btn.menu.add_radiobutton(label=self.return_time[i], value=self.return_time[i],
-        #                                           variable=self.return_timevar,
-        #                                           command=lambda: self.from_action(self.return_timevar.get()),
-        #                                           font=self.font2)
 
         self.date_back=Button(self.date_frm,text='', image=self.backarrow, border=0, cursor='hand2',command=lambda: self.cmd(0),
                bg=self.whitecolor)
@@ -586,7 +577,7 @@ class LandingPage(Frame):
 
 
     def travellerdata(self,n):
-        self.entry = [[Entry() for row in range(6)] for col in range(n)]
+        self.entry = [[Entry() for row in range(3)] for col in range(n)]
         i=1
         for col in range(n):
             for row in range(3):
@@ -630,6 +621,15 @@ class LandingPage(Frame):
                                            fg=self.darkgreencolor,
                                            border=0, width=35)
                         self.entry[col][row].insert(0, self.phone_num)
+
+    def get_pass_details(self):
+        num=self.numvar.get()
+        pass_data = [[],[],[]]
+        for col in range(num):
+            for row in range(3):
+                pass_data[row].append(self.entry[col][row].get())
+        return pass_data
+
 
 
     def next_form(self):
@@ -695,6 +695,7 @@ class LandingPage(Frame):
         self.pricepanel.grid(row=1,column=0,sticky=NW)
         self.right_frm.grid_configure(padx=(59,87))
         self.travellerdata(n)
+        print(self.get_pass_details())
         
     
     def num_menu_action(self,num):
@@ -702,12 +703,15 @@ class LandingPage(Frame):
         self.page_count = 1
         self.person_lbl.config(text=f'PERSON {self.page_count}')
         self.show_passform(int(num))
-        self.class_btns_action('FIRST CLASS')
+        self.class_btns_action('REGULAR COACH')
 
     def class_btns_action(self,n):
+        prices=fn.get_price(self.sourcevar.get(),self.destinationvar.get(),self.go_timevar.get())
+        # prices=fn.get_price(self.fro.cget('text'),self.to.cget('text'),self.go_time_btn.cget('text'))
         if n=='REGULAR COACH':
             self.class_lbl.config(text=f'{n} (88 seater)')
             self.seat_class_lbl.config(text=f'{n} (88 seater)')
+            self.regular_price=prices[2]
             self.singleprice_lbl.config(text=f'{n}: N{self.regular_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.regular_price} x {self.numvar.get()} = N{self.regular_price*int(self.numvar.get())}.00')
@@ -716,6 +720,7 @@ class LandingPage(Frame):
         elif n=='BUSINESS CLASS':
             self.class_lbl.config(text=f'{n} (40 seater)')
             self.seat_class_lbl.config(text=f'{n} (40 seater)')
+            self.business_price=prices[1]
             self.singleprice_lbl.config(text=f'{n}: N{self.business_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.business_price} x {self.numvar.get()} = N{self.business_price * int(self.numvar.get())}.00')
@@ -724,6 +729,7 @@ class LandingPage(Frame):
         elif n=='FIRST CLASS':
             self.class_lbl.config(text=f'{n} (24 seater)')
             self.seat_class_lbl.config(text=f'{n} (24 seater)')
+            self.firstclass_price=prices[0]
             self.singleprice_lbl.config(text=f'{n}: N{self.firstclass_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.firstclass_price} x {self.numvar.get()} = N{self.firstclass_price * int(self.numvar.get())}.00')
@@ -791,28 +797,27 @@ class LandingPage(Frame):
     def to_action(self,station):
         self.to.config(text=station)
 
-    def get_go_time(self):
+    def get_go_time(self,date):
         source=self.fro.cget('text')
         dest=self.to.cget('text')
-        time=fn.get_time(source,dest)
+        self.returndate.config(mindate=date+relativedelta(years=0,months=0,days=1))
+        self.returndate.set_date(date+relativedelta(years=0,months=0,days=1))
+        times=fn.get_time(source,dest,str(date))
+        self.get_return_time(date+relativedelta(years=0,months=0,days=1))
         self.go_time_btn.menu = Menu(self.go_time_btn, tearoff=0)
         self.go_time_btn['menu'] = self.go_time_btn.menu
-        for i in range(len(time)):
-            self.go_time_btn.menu.add_radiobutton(label=time[i], value=time[i],
-                                                  variable=self.go_timevar,
-                                                  command=lambda: self.go_time_btn.config(text=self.go_timevar.get()),
-                                                  font=self.font2)
-    def get_return_time(self):
+        for i in range(len(times)):
+            self.go_time_btn.menu.add_radiobutton(label=times[i], value=times[i],variable=self.go_timevar,font=self.font2,
+                                                  command=lambda: self.go_time_btn.config(text=self.go_timevar.get()))
+    def get_return_time(self,date):
         source=self.fro.cget('text')
         dest=self.to.cget('text')
-        time=fn.get_time(dest,source)
+        times=fn.get_time(dest,source,str(date))
         self.return_time_btn.menu = Menu(self.return_time_btn, tearoff=0)
         self.return_time_btn['menu'] = self.return_time_btn.menu
-        for i in range(len(time)):
-            self.return_time_btn.menu.add_radiobutton(label=time[i], value=time[i],
-                                                  variable=self.return_timevar,
-                                                  command=lambda: self.return_time_btn.config(text=self.return_timevar.get()),
-                                                  font=self.font2)
+        for i in range(len(times)):
+            self.return_time_btn.menu.add_radiobutton(label=times[i], value=times[i],font=self.font2,variable=self.return_timevar,
+                                                  command=lambda: self.return_time_btn.config(text=self.return_timevar.get()),)
 
 
 

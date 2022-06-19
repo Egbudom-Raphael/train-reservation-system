@@ -1,5 +1,8 @@
+import secrets
 import sqlite3
 import re
+import datetime
+import string
 
 
 def check_email(mail):
@@ -106,18 +109,40 @@ def get_destinations(source):
         dest_list.append(i[0])
     return dest_list
 
-def get_time(source,dest):
+def convert_to_datetime(date):
+    return datetime.datetime.strptime(date,"%Y-%m-%d")
+
+def get_time(source,dest,date):
+    datedata=convert_to_datetime(date)
     conn = sqlite3.connect('railly.db')
     c = conn.cursor()
-    time = set(c.execute("SELECT time FROM schedule WHERE dep_location=? and arr_location=?",(source,dest,)).fetchall())
+    time = set(c.execute("SELECT time,start_date,end_date FROM schedule WHERE dep_location=? and arr_location=?",(source,dest,)).fetchall())
     conn.commit()
     conn.close()
     time_list=[]
-    for i in time:
-        time_list.append(i[0])
+    time=list(time)
+    for i in range(len(time)):
+        if datedata>=convert_to_datetime(time[i][1]) and datedata<=convert_to_datetime(time[i][2]):
+            time_list.append(time[i][0])
+    print(time_list)
     return time_list
 
+def get_price(source,dest,time):
+    conn = sqlite3.connect('railly.db')
+    c = conn.cursor()
+    time = c.execute("SELECT first_class_price, business_class_price, regular_coach_price FROM schedule WHERE dep_location=? and arr_location=? and time=?",(source, dest, time,)).fetchone()
+    conn.commit()
+    conn.close()
+    return list(time)
 
+def generate_ticket_num(num):
+    nums=[]
+    for i in range(num):
+        x=''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+        nums.append(x)
+    return nums
 
-
+def generate_schedule_num(num):
+    x=''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(7))
+    return x
 

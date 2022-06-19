@@ -52,24 +52,24 @@ def CreateDatabase():
                      train_id VARCHAR NOT NULL,
                      dep_location VARCHAR NOT NULL,
                      arr_location VARCHAR NOT NULL,
-                     date VARCHAR NULL,
+                     start_date VARCHAR NOT NULL,
+                     end_date VARCHAR NOT NULL,
                      time VARCHAR NOT NULL,
-                     type INTEGER check(type in (1,2)) NOT NULL DEFAULT 1,
                      first_class_price INTEGER NOT NULL DEFAULT 0,
                      business_class_price INTEGER NOT NULL DEFAULT 0,
                      regular_coach_price INTEGER NOT NULL DEFAULT 0,
                      FOREIGN KEY(train_id) REFERENCES customer_info(train_id)
                     )""")
 
-    data=[('202201-0001', 'TIR-1001', 'Mobolaji Johnson Station', 'Babatunde Raji Fashola Station', None, '07:00:00', 1, 3000, 2000, 1000),
-          ('202201-0003', 'TIR-1002', 'Wole Soyinka Station', 'Samuel Ladoke Akintola Station', '2022/01/07', '08:00:00', 2, 3500, 2500, 1500),
-          ('202201-0002', 'TIR-1003', 'Samuel Ladoke Akintola Station', 'Obafemi Awolowo Station', None, '08:30:00', 1, 3000, 1700, 1000),
-          ('202201-0004', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', None, '00:00:00', 1, 6000, 4500, 3000),
-          ('202201-0005', 'TIR-1004', 'Obafemi Awolowo Station', 'Mobolaji Johnson Station', None, '20:00:00', 1, 6000,4500, 3000),
-          ('202201-0006', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', None, '05:00:00', 1, 6000,4500, 3000),
-          ('202201-0007', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', None, '19:45:00', 1, 6000,4500, 3000),
-          ('202201-0008', 'TIR-1002', 'Mobolaji Johnson Station', 'Babatunde Raji Fashola Station', None, '18:00:00', 1,3000, 2000, 1000),
-          ('202201-0009', 'TIR-1004', 'Obafemi Awolowo Station', 'Mobolaji Johnson Station', None, '15:30:00', 1, 6000,4500, 3000)]
+    data=[('202201-0001', 'TIR-1001', 'Mobolaji Johnson Station', 'Babatunde Raji Fashola Station', '2022-06-20','2022-06-30', '07:00:00', 3000, 2000, 1000),
+          ('202201-0003', 'TIR-1002', 'Wole Soyinka Station', 'Samuel Ladoke Akintola Station', '2022-06-22','2022-06-30', '08:00:00', 3500, 2500, 1500),
+          ('202201-0002', 'TIR-1003', 'Samuel Ladoke Akintola Station', 'Obafemi Awolowo Station', '2022-06-23','2022-06-30', '08:30:00', 3000, 1700, 1000),
+          ('202201-0004', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', '2022-07-01','2022-07-30', '00:00:00', 6000, 4500, 3000),
+          ('202201-0005', 'TIR-1004', 'Obafemi Awolowo Station', 'Mobolaji Johnson Station', '2022-07-02','2022-07-29', '20:00:00', 6000,4500, 3000),
+          ('202201-0006', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', '2022-07-09','2022-07-28', '05:00:00', 6000,4500, 3000),
+          ('202201-0007', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', '2022-07-15','2022-07-27', '19:45:00', 6000,4500, 3000),
+          ('202201-0008', 'TIR-1002', 'Mobolaji Johnson Station', 'Babatunde Raji Fashola Station', '2022-07-20','2022-07-30', '18:00:00',3000, 2000, 1000),
+          ('202201-0009', 'TIR-1004', 'Obafemi Awolowo Station', 'Mobolaji Johnson Station', '2022-07-27','2022-07-29', '15:30:00', 6000,4500, 3000)]
     c.executemany("INSERT INTO schedule VALUES(?,?,?,?,?,?,?,?,?,?)",data)
 
     # TICKET DATA
