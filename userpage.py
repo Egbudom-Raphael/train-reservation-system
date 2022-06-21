@@ -68,15 +68,18 @@ class LandingPage(Frame):
         self.menuvar=StringVar()
         self.numvar=IntVar()
         self.classval='first class'
+        self.classval2='fc'
         self.childvar=StringVar()
         self.gendervar=StringVar()
         self.gend='male'
         self.sourcedate=[]
         self.return_date=[]
+        self.remembervar=BooleanVar()
         self.date = dt.datetime.now()
         self.maxdate=self.date+relativedelta(years=0,months=2,days=0)
         self.slide=0
         self.create_widgets()
+        self.fill_card_data()
         # self.class_btns_action('FIRST CLASS')
 
 
@@ -272,7 +275,7 @@ class LandingPage(Frame):
                bg=self.whitecolor)
         self.date_next.grid(row=5, column=0,padx=60,sticky=NW)
         self.way=Button(self.date_frm, image=self.oneway_img, border=0,command=self.way_btn_action, cursor='hand2', bg=self.lightgreycolor)
-        self.way.grid(row=2, column=1,rowspan=3,pady=(15, 0),sticky=NW)
+        # self.way.grid(row=2, column=1,rowspan=3,pady=(15, 0),sticky=NW)
 
 
         # HOW DO YOU WANT TO GO
@@ -301,7 +304,7 @@ class LandingPage(Frame):
 
         Label(self.class_frm, text='CLASS:', font=self.font2, bg=self.whitecolor,
               fg=self.bluecolor).grid(row=4,column=0,sticky=NW, padx=(27,0),pady=(8,0))
-        self.class_lbl=Label(self.class_frm, text='FIRST CLASS (24 seater)', font=self.font2, bg=self.whitecolor,fg=self.greencolor)
+        self.class_lbl=Label(self.class_frm, text='SELECT SEAT CLASS', font=self.font2, bg=self.whitecolor,fg=self.greencolor)
         self.class_lbl.grid(row=4,column=0,columnspan=2,sticky=NW, padx=(100,0),pady=(8,0))
         Button(self.class_frm, image=self.regular, border=0, cursor='hand2',bg=self.whitecolor,
                command=lambda: self.class_btns_action('REGULAR COACH')).grid(row=5, column=0,columnspan=3, pady=(3,15),padx=(27,0), sticky=NW)
@@ -387,7 +390,7 @@ class LandingPage(Frame):
         Label(self.payment_frm, image=self.card, bg=self.lightgreycolor).grid(row=9, column=0,sticky=NW,padx=(80,0))
         Label(self.payment_frm, text='3 digits on the back of your card*', font=self.font3, bg=self.lightgreycolor,fg=self.greycolor).grid(row=9,column=0,padx=(120,0),sticky=W)
         self.remember=Checkbutton(self.payment_frm,text='Remember card details for next purchase',bg=self.lightgreycolor,
-                                  cursor='hand2',fg=self.darkgreencolor,font=self.font2)
+                                  cursor='hand2',variable=self.remembervar,fg=self.darkgreencolor,font=self.font2)
         self.remember.grid(row=10,column=0,pady=(5,0),sticky=NW)
         self.remember.select()
         self.pay_btn=Button(self.payment_frm,text='Pay',font=self.font2,width=17,fg=self.whitecolor,bg=self.greencolor,
@@ -500,18 +503,16 @@ class LandingPage(Frame):
         self.seat_class_lbl.grid(row=2, column=1,columnspan=2, sticky=NW, pady=(5,5),padx=(10))
         self.seat_frm=Frame(self.seat_selection_page, bg=self.lightgreycolor)
         self.seat_frm.grid(row=3, column=1,columnspan=3,rowspan=2,padx=10, sticky=NW)
-        self.seat_placement('rc',40)
         Button(self.seat_selection_page, text='P R O C E E D', font=self.font2, fg=self.whitecolor, padx=10, border=0,
-               cursor='hand2', bg=self.greencolor).grid(row=5, column=3,pady=20, sticky=NE)
+               cursor='hand2',command=self.registerall, bg=self.greencolor).grid(row=5, column=3,pady=20, sticky=NE)
 
         self.saved = []
         self.way_count=False
         self.page_count=1
+        self.completed=False
 
-    def seat_placement(self,cls,num):
+    def seat_placement(self,cls,num,z):
         count=1
-        # num=54
-        z=[1,3,6,8,23,15,33,25]
         if num>=12:
             for x in range(1,13):
                 for y in range(num//12):
@@ -630,6 +631,45 @@ class LandingPage(Frame):
                 pass_data[row].append(self.entry[col][row].get())
         return pass_data
 
+    def validate_pass_details(self):
+        data=self.get_pass_details()
+        num = len(data[0])
+        for col in range(3):
+            for row in range(num):
+                if '' in data[row][col]:
+                    messagebox.showerror('ERROR','PLEASE FILL ALL PASSENGER INFO')
+                    return False
+                else:
+                    return True
+
+    def get_all_data(self,n):
+        source=self.sourcevar.get()
+        dest=self.destinationvar.get()
+        date=self.selectdate.get_date()
+        time=self.go_timevar.get()
+        name=self.get_pass_details()
+        p_name=name[0][n]
+        p_mail=name[1][n]
+        cls=self.classval
+        num=self.numvar.get()
+        seatnum=self.saved[n]
+        username=self.username
+        return [seatnum,source,dest,date,time,p_name,cls,username,p_mail]
+
+    def registerall(self):
+        for i in range(self.numvar.get()):
+            data = self.get_all_data(i)
+            tknum = fn.generate_ticket_num()
+            seatnum = data[0]
+            schedule_id = fn.get_schedule_id(data[1], data[2], data[3], data[4])
+            fn.register_all(tknum, seatnum, schedule_id, data[5].lower(), data[3], data[4], data[6], data[7])
+            try:
+                fn.send_mail(tknum,seatnum,schedule_id,data[5],data[3],data[4],data[6],data[8])
+            except:
+                messagebox.showerror('error','error sending email')
+        messagebox.showinfo('yay', 'booking successful')
+        self.page_switcher(1)
+        self.reset()
 
 
     def next_form(self):
@@ -645,6 +685,7 @@ class LandingPage(Frame):
         else:
             pass
 
+
     def prev_form(self):
         num = len(self.entry)
         if self.page_count > 1:
@@ -659,7 +700,7 @@ class LandingPage(Frame):
         else:
             pass
 
-    def cmd(self,n):
+    def cmd_valid(self,n):
         pages=[self.dest_frm,self.date_frm,self.class_frm]
         images=[self.dest_img,self.date_img,self.premium]
         marker=[self.where,self.when,self.how]
@@ -672,6 +713,27 @@ class LandingPage(Frame):
         pages[n].grid(row=1, column=0, padx=(100, 0))
         self.where_img.config(image=images[n])
         # self.right_frm.grid_configure(padx=(112,120))
+    def cmd(self,n):
+        if n==0:
+            self.cmd_valid(n)
+        elif n==1:
+            if not self.sourcevar.get():
+                messagebox.showerror('PAUSE', 'KINDLY SELECT A SOURCE AND LOCATION')
+                print(False)
+            else:
+                if self.to.cget('text') == self.fro.cget('text'):
+                    messagebox.showerror('ERROR','INVALID DESTINATION/SOURCE')
+                else:
+                    self.get_go_time(self.selectdate.get_date())
+                    self.cmd_valid(n)
+        elif n==2:
+            if not self.go_timevar.get():
+                messagebox.showerror('PAUSE', 'KINDLY SELECT YOUR DESIRED TIME')
+            else:
+                self.cmd_valid(n)
+
+
+
 
 
     def way_btn_action(self):
@@ -695,7 +757,7 @@ class LandingPage(Frame):
         self.pricepanel.grid(row=1,column=0,sticky=NW)
         self.right_frm.grid_configure(padx=(59,87))
         self.travellerdata(n)
-        print(self.get_pass_details())
+        # print(self.get_pass_details())
         
     
     def num_menu_action(self,num):
@@ -706,45 +768,96 @@ class LandingPage(Frame):
         self.class_btns_action('REGULAR COACH')
 
     def class_btns_action(self,n):
+        source = self.sourcevar.get()
+        dest = self.destinationvar.get()
+        date = self.selectdate.get_date()
+        time = self.go_timevar.get()
+        sid = fn.get_schedule_id(source, dest, date, time)
+        seat=fn.get_num_of_seats(sid, n.lower())
         prices=fn.get_price(self.sourcevar.get(),self.destinationvar.get(),self.go_timevar.get())
-        # prices=fn.get_price(self.fro.cget('text'),self.to.cget('text'),self.go_time_btn.cget('text'))
         if n=='REGULAR COACH':
-            self.class_lbl.config(text=f'{n} (88 seater)')
-            self.seat_class_lbl.config(text=f'{n} (88 seater)')
+            self.class_lbl.config(text=f'{n} ({seat} seater)')
+            self.seat_class_lbl.config(text=f'{n} ({seat} seater)')
             self.regular_price=prices[2]
             self.singleprice_lbl.config(text=f'{n}: N{self.regular_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.regular_price} x {self.numvar.get()} = N{self.regular_price*int(self.numvar.get())}.00')
             self.pay_btn.config(text=f'PAY N{self.regular_price*int(self.numvar.get())}.00')
-            self.classval='regular class'
+            self.classval='regular coach'
+            self.classval2='rc'
         elif n=='BUSINESS CLASS':
-            self.class_lbl.config(text=f'{n} (40 seater)')
-            self.seat_class_lbl.config(text=f'{n} (40 seater)')
+            self.class_lbl.config(text=f'{n} ({seat} seater)')
+            self.seat_class_lbl.config(text=f'{n} ({seat} seater)')
             self.business_price=prices[1]
             self.singleprice_lbl.config(text=f'{n}: N{self.business_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.business_price} x {self.numvar.get()} = N{self.business_price * int(self.numvar.get())}.00')
             self.pay_btn.config(text=f'PAY N{self.business_price*int(self.numvar.get())}.00')
             self.classval='business class'
+            self.classval2 = 'bc'
         elif n=='FIRST CLASS':
-            self.class_lbl.config(text=f'{n} (24 seater)')
-            self.seat_class_lbl.config(text=f'{n} (24 seater)')
+            self.class_lbl.config(text=f'{n} ({seat} seater)')
+            self.seat_class_lbl.config(text=f'{n} ({seat} seater)')
             self.firstclass_price=prices[0]
             self.singleprice_lbl.config(text=f'{n}: N{self.firstclass_price}.00')
             self.sub_total_lbl.config(
                 text=f'SUB TOTAL: {self.firstclass_price} x {self.numvar.get()} = N{self.firstclass_price * int(self.numvar.get())}.00')
             self.pay_btn.config(text=f'PAY N{self.firstclass_price*int(self.numvar.get())}.00')
-            self.classval='business class'
+            self.classval='first class'
+            self.classval2 = 'fc'
         else:
             pass
 
-    def page_switcher(self,n):
+    def page_switcher2(self,n):
         pages=[self.landing_page,self.book_page,self.payment_page,self.edit_page,self.seat_selection_page]
         colors=[self.bluecolor,self.whitecolor,self.lightgreycolor,self.lightgreycolor,self.lightgreycolor]
         for i in range(len(pages)):
             pages[i].grid_forget()
         pages[n].grid(row=1,column=0,sticky=NW)
         self.master.configure(bg=colors[n])
+    def page_switcher(self,n):
+        if n==2:
+            if self.numvar.get():
+                if '' in self.get_pass_details()[0]:
+                    messagebox.showerror('WAIT', 'KINDLY FILL ALL PASSENGER DETAILS')
+                else:
+                    self.page_switcher2(n)
+            else:
+                messagebox.showerror('WAIT','KINDLY SELECT NUMBER OF PASSENGERS')
+        elif n==4:
+            if self.check_payment():
+                if self.remembervar.get():
+                    fn.store_card_details(self.check_payment(),self.username)
+                else:
+                    fn.forget_card_details(self.username)
+                source = self.sourcevar.get()
+                dest = self.destinationvar.get()
+                date = self.selectdate.get_date()
+                time = self.go_timevar.get()
+                sid=fn.get_schedule_id(source,dest,date,time)
+                messagebox.showinfo('SUCCESS','Payment successful')
+                self.seat_placement(self.classval2, fn.get_num_of_seats(sid,self.classval), fn.get_seats(self.classval,sid))
+                self.page_switcher2(n)
+                self.completed=True
+            else:
+                messagebox.showerror('CHILL','PLS COMPLETE PAYMENT INFO')
+        else:
+            if self.completed:
+                pass
+            else:
+                self.page_switcher2(n)
+
+    def check_payment(self):
+        if self.card_num.get() and self.exp_month.get() and self.exp_year.get() and self.card_holder.get() and self.sec_code.get():
+            return [self.card_num.get(), self.exp_month.get(), self.exp_year.get(), self.card_holder.get(), self.sec_code.get()]
+
+    def fill_card_data(self):
+        data=fn.get_card_details(self.username)
+        entries=[self.card_num, self.exp_month, self.exp_year, self.card_holder, self.sec_code]
+        if data[0]:
+            for i in range(len(data)):
+                entries[i].insert(0,data[i])
+
 
     def mainmenu_action(self,item):
         if item=='PROFILE':
@@ -752,7 +865,10 @@ class LandingPage(Frame):
         elif item=='TICKETS':
             self.page_switcher(3)
         elif item== 'LOGOUT':
-            self.master.destroy()
+            if self.completed:
+                messagebox.showwarning('HOLD UP','PLEASE COMPLETE BOOKING')
+            else:
+                self.master.destroy()
 
 
     def on_enter(self,event):
@@ -774,6 +890,8 @@ class LandingPage(Frame):
         self.gend=gend.lower()
 
     def from_action(self, station):
+        self.go_time_btn.config(text='GOING')
+        self.go_timevar.set('')
         self.fro.config(text=station)
         destination=fn.get_destinations(station)
         if station in destination:
@@ -785,8 +903,12 @@ class LandingPage(Frame):
                                                  command=lambda: self.to_action(self.destinationvar.get()),
                                                  font=self.font2)
             destination.append(station)
+
         else:
             # destination.remove(station)
+            if station==self.destinationvar.get():
+                self.to_btn.config(text=destination[0])
+                self.destinationvar.set(destination[0])
             self.to_btn.menu = Menu(self.to_btn, tearoff=0)
             self.to_btn['menu'] = self.to_btn.menu
             for i in range(len(destination)):
@@ -794,6 +916,7 @@ class LandingPage(Frame):
                                                  variable=self.destinationvar,
                                                  command=lambda: self.to_action(self.destinationvar.get()),
                                                  font=self.font2)
+
     def to_action(self,station):
         self.to.config(text=station)
 
@@ -818,6 +941,37 @@ class LandingPage(Frame):
         for i in range(len(times)):
             self.return_time_btn.menu.add_radiobutton(label=times[i], value=times[i],font=self.font2,variable=self.return_timevar,
                                                   command=lambda: self.return_time_btn.config(text=self.return_timevar.get()),)
+
+    def reset(self):
+        self.to.config(text='Select Station')
+        self.fro.config(text='Select Station')
+        self.sourcevar.set('')
+        self.destinationvar.set('')
+        self.selectdate.set_date(datetime.datetime.today())
+        self.go_time_btn.config(text='GOING')
+        self.go_timevar.set('')
+        self.passnum.config(text='SELECT No OF PASSENGERS')
+        self.numvar.set(0)
+        self.person_lbl.config(text='PERSON 1')
+        self.page_count = 1
+        self.class_lbl.config(text='SELECT SEAT CLASS')
+        if not self.remembervar:
+            self.card_num.delete(0,END)
+            self.exp_month.delete(0,END)
+            self.exp_year.delete(0,END)
+            self.card_holder.delete(0,END)
+            self.sec_code.delete(0,END)
+        self.right_frm.grid_configure(padx=(112, 120))
+        self.pass_details.grid_forget()
+        self.pricepanel.grid_forget()
+        self.where_img.grid(row=0, column=0, sticky=NW)
+        self.seat_frm.destroy()
+        self.seat_frm=Frame(self.seat_selection_page, bg=self.lightgreycolor)
+        self.seat_frm.grid(row=3, column=1,columnspan=3,rowspan=2,padx=10, sticky=NW)
+        self.saved=[]
+        self.completed = False
+        self.cmd(0)
+        self.page_switcher(1)
 
 
 

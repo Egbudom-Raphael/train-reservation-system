@@ -1,7 +1,16 @@
 import sqlite3
+from datetime import datetime
 
+
+def convert(date):
+    data = datetime.strptime(date,"%Y-%m-%d")
+    return data.date()
+
+     
 def CreateDatabase():
-    conn = sqlite3.connect('railly.db')
+    conn = sqlite3.connect('railly.db',
+                           detect_types=sqlite3.PARSE_DECLTYPES |
+                                        sqlite3.PARSE_COLNAMES)
     c = conn.cursor()
 
     # CUSTOMER INFORMATION
@@ -35,8 +44,8 @@ def CreateDatabase():
                      train_id VARCHAR NOT NULL PRIMARY KEY,
                      name VARCHAR NOT NULL,
                      first_class_capacity INTEGER NOT NULL DEFAULT 0,
-                     business_class capacity INTEGER NOT NULL DEFAULT 0,
-                     regular_coach capacity INTEGER NOT NULL DEFAULT 0
+                     business_class_capacity INTEGER NOT NULL DEFAULT 0,
+                     regular_coach_capacity INTEGER NOT NULL DEFAULT 0
                     )""")
 
     data=[( 'TIR-1001', 'Train 101', 24, 40, 88),
@@ -44,7 +53,7 @@ def CreateDatabase():
           ('TIR-1003', 'Train 103', 30, 50, 92),
           ('TIR-1004', 'Train 104', 12, 50, 70),
           ('TIR-1005', 'Train 105', 20, 45, 70)]
-    c.executemany("INSERT INTO trains(train_id, name, first_class_capacity, business_class, regular_coach) VALUES(?,?,?,?,?)",data)
+    c.executemany("INSERT INTO trains(train_id, name, first_class_capacity, business_class_capacity, regular_coach_capacity) VALUES(?,?,?,?,?)",data)
 
     #SCHEDULES
     c.execute("""CREATE TABLE IF NOT EXISTS schedule(
@@ -52,8 +61,8 @@ def CreateDatabase():
                      train_id VARCHAR NOT NULL,
                      dep_location VARCHAR NOT NULL,
                      arr_location VARCHAR NOT NULL,
-                     start_date VARCHAR NOT NULL,
-                     end_date VARCHAR NOT NULL,
+                     start_date timestamp NOT NULL,
+                     end_date timestamp NOT NULL,
                      time VARCHAR NOT NULL,
                      first_class_price INTEGER NOT NULL DEFAULT 0,
                      business_class_price INTEGER NOT NULL DEFAULT 0,
@@ -61,24 +70,24 @@ def CreateDatabase():
                      FOREIGN KEY(train_id) REFERENCES customer_info(train_id)
                     )""")
 
-    data=[('202201-0001', 'TIR-1001', 'Mobolaji Johnson Station', 'Babatunde Raji Fashola Station', '2022-06-20','2022-06-30', '07:00:00', 3000, 2000, 1000),
-          ('202201-0003', 'TIR-1002', 'Wole Soyinka Station', 'Samuel Ladoke Akintola Station', '2022-06-22','2022-06-30', '08:00:00', 3500, 2500, 1500),
-          ('202201-0002', 'TIR-1003', 'Samuel Ladoke Akintola Station', 'Obafemi Awolowo Station', '2022-06-23','2022-06-30', '08:30:00', 3000, 1700, 1000),
-          ('202201-0004', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', '2022-07-01','2022-07-30', '00:00:00', 6000, 4500, 3000),
-          ('202201-0005', 'TIR-1004', 'Obafemi Awolowo Station', 'Mobolaji Johnson Station', '2022-07-02','2022-07-29', '20:00:00', 6000,4500, 3000),
-          ('202201-0006', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', '2022-07-09','2022-07-28', '05:00:00', 6000,4500, 3000),
-          ('202201-0007', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', '2022-07-15','2022-07-27', '19:45:00', 6000,4500, 3000),
-          ('202201-0008', 'TIR-1002', 'Mobolaji Johnson Station', 'Babatunde Raji Fashola Station', '2022-07-20','2022-07-30', '18:00:00',3000, 2000, 1000),
-          ('202201-0009', 'TIR-1004', 'Obafemi Awolowo Station', 'Mobolaji Johnson Station', '2022-07-27','2022-07-29', '15:30:00', 6000,4500, 3000)]
+    data=[('Y2D4P4F9', 'TIR-1001', 'Mobolaji Johnson Station', 'Babatunde Raji Fashola Station', convert('2022-06-20'),convert('2022-06-30'), '07:00:00', 3000, 2000, 1000),
+          ('JT7FAOQ5', 'TIR-1002', 'Wole Soyinka Station', 'Samuel Ladoke Akintola Station', convert('2022-06-22'),convert('2022-06-30'), '08:00:00', 3500, 2500, 1500),
+          ('WUJ4QQKI', 'TIR-1003', 'Samuel Ladoke Akintola Station', 'Obafemi Awolowo Station', convert('2022-06-23'),convert('2022-06-30'), '08:30:00', 3000, 1700, 1000),
+          ('RRE1UAJW', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', convert('2022-07-01'),convert('2022-07-30'), '00:00:00', 6000, 4500, 3000),
+          ('KR6MW6WJ', 'TIR-1004', 'Obafemi Awolowo Station', 'Mobolaji Johnson Station', convert('2022-07-02'),convert('2022-07-29'), '20:00:00', 6000,4500, 3000),
+          ('LXM4CBI5', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', convert('2022-07-09'),convert('2022-07-28'), '05:00:00', 6000,4500, 3000),
+          ('0PV66W5G', 'TIR-1004', 'Mobolaji Johnson Station', 'Obafemi Awolowo Station', convert('2022-07-15'),convert('2022-07-27'), '19:45:00', 6000,4500, 3000),
+          ('B7HYW9Q0', 'TIR-1002', 'Mobolaji Johnson Station', 'Babatunde Raji Fashola Station', convert('2022-07-20'),convert('2022-07-30'), '18:00:00',3000, 2000, 1000),
+          ('0TVH9HEM', 'TIR-1004', 'Obafemi Awolowo Station', 'Mobolaji Johnson Station', convert('2022-07-27'),convert('2022-07-29'), '15:30:00', 6000,4500, 3000)]
     c.executemany("INSERT INTO schedule VALUES(?,?,?,?,?,?,?,?,?,?)",data)
 
     # TICKET DATA
     c.execute("""CREATE TABLE IF NOT EXISTS tickets(
                      ticket_num VARCHAR NOT NULL PRIMARY KEY,
-                     seat_num VARCHAR NOT NULL UNIQUE,
+                     seat_num VARCHAR NOT NULL,
                      schedule_id VARCHAR NOT NULL,
                      p_name VARCHAR NOT NULL,
-                     dep_date VARCHAR NOT NULL,
+                     dep_date timestamp NOT NULL,
                      dep_time VARCHAR NOT NULL,
                      class VARCHAR check(class in ('first class', 'business class', 'regular coach')) NOT NULL,
                      username VARCHAR NOT NULL,
@@ -86,10 +95,10 @@ def CreateDatabase():
                      FOREIGN KEY(schedule_id) REFERENCES customer_info(schedule_id)
                     )""")
 
-    data=[('12205A','FC-1','202201-0001','egbudom raphael','2022/01/07','08:00:00','first class','sugarpops'),
-          ('22205B', 'BC-1', '202201-0001', 'egbudom jude', '2022/01/07', '08:00:00', 'business class', 'jet'),
-          ('32205C', 'RC-1', '202201-0001', 'egbudom maryann', '2022/01/07', '08:00:00', 'regular coach', 'rianne'),
-          ('42205D', 'FC-2', '202201-0001', 'egbudom marylyn', '2022/01/07', '08:00:00', 'first class', 'marylyn')]
+    data=[('12205A','fc-1','JT7FAOQ5','egbudom raphael',convert('2022-06-22'),'08:00:00','first class','sugarpops'),
+          ('22205B', 'bc-1', 'JT7FAOQ5', 'egbudom jude', convert('2022-06-22'), '08:00:00', 'business class', 'jet'),
+          ('32205C', 'rc-1', 'JT7FAOQ5', 'egbudom maryann', convert('2022-06-22'), '08:00:00', 'regular coach', 'rianne'),
+          ('42205D', 'fc-2', 'JT7FAOQ5', 'egbudom marylyn', convert('2022-06-22'), '08:00:00', 'first class', 'marylyn')]
     c.executemany("INSERT INTO tickets VALUES(?,?,?,?,?,?,?,?)",data)
 
 
