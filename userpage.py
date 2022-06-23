@@ -52,7 +52,7 @@ class LandingPage(Frame):
         self.m_name='chidindu'
         self.email='egbudomraphael@gmail.com'
         self.phone_num='08091516236'
-        self.deficit=(10-len(self.username))*8.5
+        self.deficit=(10-len(self.username))*10.5
         self.regular_price=2000
         self.business_price=self.regular_price*2
         self.firstclass_price=self.regular_price*3
@@ -84,7 +84,7 @@ class LandingPage(Frame):
 
 
     def create_widgets(self):
-        self.logo = ImageTk.PhotoImage(Image.open("railly logo green.png"))
+        self.logo = ImageTk.PhotoImage(Image.open("trainplus.png"))
         self.logout = ImageTk.PhotoImage(Image.open("profile-user.png"))
         self.entrybg=ImageTk.PhotoImage(Image.open("img_textBox0.png"))
         self.entrybg2=ImageTk.PhotoImage(Image.open("img_textBox0.png").resize((343,69),))
@@ -139,7 +139,7 @@ class LandingPage(Frame):
 
         # LOGO
         self.logo_btn = Button(self.navbar, image=self.logo,border=0,cursor='hand2',command=lambda: self.page_switcher(0),bg=self.bluecolor)
-        self.logo_btn.grid(row=0,column=0,pady=10,sticky=NW)
+        self.logo_btn.grid(row=0,column=0,pady=3,padx=(20,0),sticky=NW)
         self.username_display=Label(self.navbar,text=self.username.upper(),font=self.font2,bg=self.bluecolor,fg=self.greencolor)
         # self.username_display.grid(row=0,column=1,sticky=E,padx=(740+self.deficit,0))
 
@@ -147,7 +147,7 @@ class LandingPage(Frame):
         menuitems=['PROFILE','TICKETS','LOGOUT']
         self.mainmenu = Menubutton(self.navbar, text=self.username.upper(),compound=RIGHT,image=self.logout,
                                    border=0,font=self.font2,fg=self.greencolor,cursor='hand2', bg=self.bluecolor)
-        self.mainmenu.grid(row=0, column=2,padx=(730+self.deficit,21),sticky=E)
+        self.mainmenu.grid(row=0, column=2,padx=(680+self.deficit,21),sticky=E)
 
         self.mainmenu.menu = Menu(self.mainmenu, tearoff=0)
         self.mainmenu['menu'] = self.mainmenu.menu
@@ -160,7 +160,7 @@ class LandingPage(Frame):
         self.landing_page.grid(row=1,column=0,sticky=NW)
         Label(self.landing_page, image=self.captain, bg=self.bluecolor).grid(row=0,padx=(20,0), column=0,sticky=NW)
         Label(self.landing_page,text=f'WELCOME BACK {self.f_name.upper()}!',font=self.font1,bg=self.bluecolor,fg=self.greencolor).grid(row=0,column=1,columnspan=2,sticky=NW)
-        text='In case you forgot, RAILLY our little app, has\n made train booking your LAGOS-IBADAN\n metro booking easy and user friendly...'
+        text='In case you forgot, TRAIN PLUS+ our little app, has\n made train booking your LAGOS-IBADAN\n metro booking easy and user friendly...'
         Label(self.landing_page,text=text,font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=1,column=2,pady=(15,10),padx=(450,0),sticky=NE)
         Label(self.landing_page, image=self.captain2, bg=self.bluecolor).grid(row=1, column=3,pady=(15,10),sticky=NE)
         text2='Make quick transactions without having to put\n your card details everytime you wish to make\n payment, with our secure cloud data storage...'
@@ -169,7 +169,7 @@ class LandingPage(Frame):
         text3='Our system is advanced enough to allow\n a single user to book a slots for family and/or\n friends, up to a whooping number of 6...'
         Label(self.landing_page,text=text3,font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=3,column=2,pady=(15,10),padx=(450,0),sticky=NE)
         Label(self.landing_page, image=self.captain3, bg=self.bluecolor).grid(row=3, column=3,pady=(15,10),sticky=NE)
-        text4='Sit back, relax and watch RAILLY do its thing,\n thanks for using our app and have a great travel!'
+        text4='Sit back, relax and watch TRAIN PLUS+ do its thing,\n thanks for using our app and have a great travel!'
         Label(self.landing_page, image=self.relax, bg=self.bluecolor).grid(row=4,padx=(20,0), column=0,sticky=NW,pady=(15,0))
         Label(self.landing_page,text=text4,font=self.font2,bg=self.bluecolor,fg=self.greencolor).grid(row=4,column=1,sticky=NW,pady=(15,0),columnspan=2)
         self.continue_btn=Button(self.landing_page,text='Click here to continue>>>',font=self.font6,bg=self.bluecolor,
@@ -657,19 +657,22 @@ class LandingPage(Frame):
         return [seatnum,source,dest,date,time,p_name,cls,username,p_mail]
 
     def registerall(self):
-        for i in range(self.numvar.get()):
-            data = self.get_all_data(i)
-            tknum = fn.generate_ticket_num()
-            seatnum = data[0]
-            schedule_id = fn.get_schedule_id(data[1], data[2], data[3], data[4])
-            fn.register_all(tknum, seatnum, schedule_id, data[5].lower(), data[3], data[4], data[6], data[7])
-            try:
-                fn.send_mail(tknum,seatnum,schedule_id,data[5],data[3],data[4],data[6],data[8])
-            except:
-                messagebox.showerror('error','error sending email')
-        messagebox.showinfo('yay', 'booking successful')
-        self.page_switcher(1)
-        self.reset()
+        if fn.check_connection():
+            if self.saved:
+                for i in range(self.numvar.get()):
+                    data = self.get_all_data(i)
+                    tknum = fn.generate_ticket_num()
+                    seatnum = data[0]
+                    schedule_id = fn.get_schedule_id(data[1], data[2], data[3], data[4])
+                    fn.register_all(tknum, seatnum, schedule_id, data[5].lower(), data[3], data[4], data[6], data[7])
+                    fn.send_mail(tknum,seatnum,schedule_id,data[5],data[3],data[4],data[6],data[8])
+                messagebox.showinfo('yay', 'booking successful')
+                self.page_switcher(1)
+                self.reset()
+            else:
+                messagebox.showerror('LAST CARD','PLEASE SELECT A SEAT!')
+        else:
+            messagebox.showerror('Error','PLEASE CONNECT TO THE INTERNET TO COMPLETE BOOKING')
 
 
     def next_form(self):
@@ -980,7 +983,8 @@ root=Tk()
 root.resizable(0, 0)
 root.configure(bg='#110445')
 root.geometry('1000x600+183+60')
-root.title('R A I L L Y')
+root.title('TRAIN PLUS+')
+root.iconbitmap('hyperloop.ico')
 # root.overrideredirect(1)
 apk = LandingPage(root)
 apk.mainloop()

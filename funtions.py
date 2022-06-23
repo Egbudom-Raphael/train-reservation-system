@@ -5,6 +5,7 @@ import datetime
 import string
 import smtplib
 import credentials as cd
+import urllib.request
 
 def check_email(mail):
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,3}\b'
@@ -243,3 +244,9 @@ def send_mail(tknum,seatnum,train_name,name,date,time,cls,email):
     s.sendmail(cd.sender,email,message)
     s.quit()
 
+def check_connection(host='http://google.com'):
+    try:
+        urllib.request.urlopen(host)
+        return True
+    except:
+        return False
