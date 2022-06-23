@@ -2,15 +2,18 @@ import datetime
 from tkinter import *
 from tkinter import font as f
 from tkcalendar import *
+from tkinter.ttk import Progressbar
 import datetime as dt
 from dateutil.relativedelta import relativedelta
-import time
-from PIL import ImageTk, Image
-import random
+# import t
+# from PIL import ImageTk, Image
+# import random
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk, Image
 import funtions as fn
+import threading
+
 
 
 class LandingPage(Frame):
@@ -504,7 +507,7 @@ class LandingPage(Frame):
         self.seat_frm=Frame(self.seat_selection_page, bg=self.lightgreycolor)
         self.seat_frm.grid(row=3, column=1,columnspan=3,rowspan=2,padx=10, sticky=NW)
         Button(self.seat_selection_page, text='P R O C E E D', font=self.font2, fg=self.whitecolor, padx=10, border=0,
-               cursor='hand2',command=self.registerall, bg=self.greencolor).grid(row=5, column=3,pady=20, sticky=NE)
+               cursor='hand2',command=self.stuck_solution, bg=self.greencolor).grid(row=5, column=3,pady=20, sticky=NE)
 
         self.saved = []
         self.way_count=False
@@ -658,14 +661,25 @@ class LandingPage(Frame):
 
     def registerall(self):
         if fn.check_connection():
-            if self.saved:
+            if len(self.saved)==self.numvar.get():
+                s = ttk.Style()
+                s.theme_use('alt')
+                s.configure("green.Horizontal.TProgressbar",foreground=self.greencolor,background=self.greencolor)
+                top=Toplevel()
+                top.title('loading...')
+                top.geometry('300x60+533+240')
+                Label(top,text='sending tickets to your mail',font=self.font4,fg=self.greencolor).pack()
+                bar=Progressbar(top,style="green.Horizontal.TProgressbar",orient=HORIZONTAL,length=300,mode='indeterminate')
+                bar.pack(padx=10)
                 for i in range(self.numvar.get()):
+                    bar.start(10)
                     data = self.get_all_data(i)
                     tknum = fn.generate_ticket_num()
                     seatnum = data[0]
                     schedule_id = fn.get_schedule_id(data[1], data[2], data[3], data[4])
                     fn.register_all(tknum, seatnum, schedule_id, data[5].lower(), data[3], data[4], data[6], data[7])
-                    fn.send_mail(tknum,seatnum,schedule_id,data[5],data[3],data[4],data[6],data[8])
+                    fn.send_mail(tknum,data[8])
+                top.destroy()
                 messagebox.showinfo('yay', 'booking successful')
                 self.page_switcher(1)
                 self.reset()
@@ -674,7 +688,10 @@ class LandingPage(Frame):
         else:
             messagebox.showerror('Error','PLEASE CONNECT TO THE INTERNET TO COMPLETE BOOKING')
 
-
+    def stuck_solution(self):
+        self.stuck=threading.Thread(target=self.registerall)
+        self.stuck.daemon=True
+        self.stuck.start()
     def next_form(self):
         num=len(self.entry)
         if self.page_count<num:

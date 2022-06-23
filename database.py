@@ -85,14 +85,14 @@ def CreateDatabase():
     c.execute("""CREATE TABLE IF NOT EXISTS tickets(
                      ticket_num VARCHAR NOT NULL PRIMARY KEY,
                      seat_num VARCHAR NOT NULL,
-                     schedule_id VARCHAR NOT NULL,
+                     schedule_num VARCHAR NOT NULL,
                      p_name VARCHAR NOT NULL,
                      dep_date timestamp NOT NULL,
                      dep_time VARCHAR NOT NULL,
                      class VARCHAR check(class in ('first class', 'business class', 'regular coach')) NOT NULL,
                      username VARCHAR NOT NULL,
                      FOREIGN KEY(username) REFERENCES customer_info(username),
-                     FOREIGN KEY(schedule_id) REFERENCES customer_info(schedule_id)
+                     FOREIGN KEY(schedule_num) REFERENCES customer_info(schedule_id)
                     )""")
 
     data=[('12205A','fc-1','JT7FAOQ5','egbudom raphael',convert('2022-06-22'),'08:00:00','first class','sugarpops'),

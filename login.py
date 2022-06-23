@@ -34,7 +34,7 @@ class LandingPage(Frame):
         self.slideshow()
 
     def create_widgets(self):
-        self.img = PhotoImage(file=f"railly logo green.png")
+        self.img = PhotoImage(file=f"trainplus.png")
         self.entryimg =ImageTk.PhotoImage(Image.open("textBox1.png").resize((250,30)))
         self.entryimg2 = ImageTk.PhotoImage(Image.open("textBox1.png").resize((150, 30)))
         self.toggle_btn_img = ImageTk.PhotoImage(Image.open("view.png"))
@@ -83,12 +83,12 @@ class LandingPage(Frame):
 
 
         self.jumbotron=Frame(self.master,bg=self.bluecolor)
-        self.jumbotron.grid(row=1,column=2,padx=(80,0),sticky=NW)
+        self.jumbotron.grid(row=1,column=2,padx=(50,0),sticky=W)
         self.jumbo_img=Label(self.jumbotron, image=self.trainimg, bg=self.bluecolor)
         self.jumbo_img.grid(row=0, column=0, sticky=N)
         self.jumbo_head=Label(self.jumbotron, text="LOGIN TO THE APP", font=self.font4, bg=self.bluecolor, fg=self.greencolor)
         self.jumbo_head.grid(row=1, column=0, sticky=N,pady=(10,0))
-        self.jumbo_body=Label(self.jumbotron, text="Choose a username and password.\nLogin to the application and\n begin your journey with RAILLY",
+        self.jumbo_body=Label(self.jumbotron, text="Choose a username and password.\nLogin to the application and\n begin your journey with TRAIN PLUS+",
                               font=self.font4, bg=self.bluecolor, fg=self.whitecolor)
         self.jumbo_body.grid(row=2,column=0,sticky=N)
 
@@ -181,11 +181,11 @@ class LandingPage(Frame):
         elif self.slide==3:
             self.jumbo_img.config(image=self.qrcodeimg)
             self.jumbo_head.config(text='TRAVEL WITHOUT HASSLES')
-            self.jumbo_body.config(text='Use your QR ticket to gain\nentry and exit at RAILLY listed\n stations and enjoy a hassle free journey')
+            self.jumbo_body.config(text='Use your QR ticket to gain\nentry and exit at TRAIN PLUS+ listed\n stations and enjoy a hassle free journey')
         elif self.slide==4:
             self.jumbo_img.config(image=self.trainimg)
             self.jumbo_head.config(text='LOGIN TO THE APP')
-            self.jumbo_body.config(text='Choose a username and password.\nLogin to the application and\n begin your journey with RAILLY')
+            self.jumbo_body.config(text='Choose a username and password.\nLogin to the application and\n begin your journey with TRAIN PLUS+')
         self.slide+=1
         self.after(3000, self.slideshow)
 

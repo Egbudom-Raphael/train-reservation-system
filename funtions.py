@@ -183,10 +183,10 @@ def get_num_of_seats(schedule_id,cls):
     num=num[0]
     return num
 # print(get_num_of_seats('WUJ4QQKI','business class'))
-def get_seats(cls='first class',schedule_id='LXM4CBI5'):
+def get_seats(cls='first class',schedule_num='LXM4CBI5'):
     conn = sqlite3.connect('railly.db')
     c = conn.cursor()
-    seats=c.execute("SELECT seat_num FROM tickets where schedule_id=? AND class=?",(schedule_id,cls,)).fetchall()
+    seats=c.execute("SELECT seat_num FROM tickets where schedule_num=? AND class=?",(schedule_num,cls,)).fetchall()
     conn.commit()
     conn.close()
     new_list=[]
@@ -228,21 +228,36 @@ def get_card_details(username):
     conn.close()
     return list(card)
 
-def send_mail(tknum,seatnum,train_name,name,date,time,cls,email):
+def send_mail(tknum,email):
+    conn = sqlite3.connect('railly.db')
+    c = conn.cursor()
+    data = c.execute("""SELECT ticket_num,seat_num,train_id,p_name,dep_date,dep_time,class,dep_location,arr_location
+                        FROM tickets
+                        INNER JOIN schedule
+                        ON tickets.schedule_num = schedule.schedule_id
+                        WHERE ticket_num=?""", (tknum,)).fetchone()
+    conn.commit()
+    conn.close()
+    print(data)
     message=f"""Subject: YOUR TICKET\n
-            Ticket number: \t{tknum}\n
-            Seat number: \t{seatnum}\n
-            Travel number: \t{train_name}\n
-            Passenger name: \t{name.title()}\n
-            Departure date: \t{date}\n
-            Departure time: \t{time}\n
-            Seat class: \t{cls}\n
+            Ticket number: \t{data[0]}\n
+            Seat number: \t{data[1]}\n
+            Train number: \t{data[2]}\n
+            Passenger name: \t{data[3].title()}\n
+            Departure date: \t{data[4]}\n
+            Departure time: \t{data[5]}\n
+            Seat class: \t{data[6]}\n
+            Departure station: \t{data[7]}\n
+            Arrival station: \t{data[8]}\n
             """
-    s=smtplib.SMTP('smtp.gmail.com',587)
-    s.starttls()
-    s.login(cd.sender, cd.password)
-    s.sendmail(cd.sender,email,message)
-    s.quit()
+    try:
+        s=smtplib.SMTP('smtp.gmail.com',587)
+        s.starttls()
+        s.login(cd.sender, cd.password)
+        s.sendmail(cd.sender,email,message)
+        s.quit()
+    except:
+        pass
 
 def check_connection(host='http://google.com'):
     try:
@@ -250,3 +265,18 @@ def check_connection(host='http://google.com'):
         return True
     except:
         return False
+
+def get_full_booking(username='sugarpops'):
+    conn = sqlite3.connect('railly.db')
+    c = conn.cursor()
+    data=c.execute("""SELECT ticket_num,seat_num,train_id,p_name,dep_date,dep_time,class,dep_location,arr_location
+                        FROM tickets
+                        INNER JOIN schedule
+                        ON tickets.schedule_num = schedule.schedule_id
+                        
+                        WHERE username=?""",(username,)).fetchone()
+    for i in data:
+        print(i)
+    conn.commit()
+    conn.close()
+# get_full_booking()
