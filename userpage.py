@@ -5,7 +5,7 @@ from tkcalendar import *
 from tkinter.ttk import Progressbar
 import datetime as dt
 from dateutil.relativedelta import relativedelta
-# import t
+# import time
 # from PIL import ImageTk, Image
 # import random
 from tkinter import ttk
@@ -17,7 +17,7 @@ import threading
 
 
 class LandingPage(Frame):
-    def __init__(self, master):
+    def __init__(self, master,profile):
         super(LandingPage, self).__init__(master)
         self.master=master
         self.grid()
@@ -49,12 +49,12 @@ class LandingPage(Frame):
         style.map('TCombobox', fieldbackground=[('readonly', self.lightgreycolor)])
         style.map('TCombobox', selectbackground=[('readonly', self.lightgreycolor)])
         style.map('TCombobox', foreground=[('readonly', self.greencolor)])
-        self.username='sugarpops'
-        self.l_name='egbudom'
-        self.f_name='raphael'
-        self.m_name='chidindu'
-        self.email='egbudomraphael@gmail.com'
-        self.phone_num='08091516236'
+        self.username=profile[0]
+        self.l_name=profile[1]
+        self.f_name=profile[3]
+        self.m_name=profile[2]
+        self.email=profile[5]
+        self.phone_num=profile[6]
         self.deficit=(10-len(self.username))*10.5
         self.regular_price=2000
         self.business_price=self.regular_price*2
@@ -74,7 +74,7 @@ class LandingPage(Frame):
         self.classval2='fc'
         self.childvar=StringVar()
         self.gendervar=StringVar()
-        self.gend='male'
+        self.gend=profile[4]
         self.sourcedate=[]
         self.return_date=[]
         self.remembervar=BooleanVar()
@@ -83,6 +83,7 @@ class LandingPage(Frame):
         self.slide=0
         self.create_widgets()
         self.fill_card_data()
+        self.master.protocol("WM_DELETE_WINDOW",self.close_all)
         # self.class_btns_action('FIRST CLASS')
 
 
@@ -485,7 +486,7 @@ class LandingPage(Frame):
                                   command=lambda: self.toggle_password(self.password_ent, self.toggle_btn2))
         self.toggle_btn2.grid(row=10, column=1, padx=(60, 0), sticky=W)
         Button(self.edit_frm, text='S U B M I T', font=self.font2, fg=self.whitecolor, padx=33, border=0,cursor='hand2',bg=self.greencolor,
-               command=lambda: self.page_switcher(0)).grid(row=11, column=2, padx=(5, 0), sticky=W)
+               command=self.edit_profile_action).grid(row=11, column=2, padx=(5, 0), sticky=W)
         Label(self.edit_page, image=self.premium, bg=self.lightgreycolor).grid(row=2, column=0,padx=30, sticky=W)
 
 
@@ -509,10 +510,107 @@ class LandingPage(Frame):
         Button(self.seat_selection_page, text='P R O C E E D', font=self.font2, fg=self.whitecolor, padx=10, border=0,
                cursor='hand2',command=self.stuck_solution, bg=self.greencolor).grid(row=5, column=3,pady=20, sticky=NE)
 
+
+        # TICKETS PAGE
+        self.tickets_page = Frame(self.master, bg=self.whitecolor)
+        # self.tickets_page.grid(row=1, column=0, sticky=NW)
+        Button(self.tickets_page, image=self.back_img, border=0, cursor='hand2', command=lambda: self.page_switcher(1),
+               bg=self.whitecolor).grid(row=0, column=0, sticky=W, pady=(13, 30), padx=(30, 0))
+        Label(self.tickets_page, text="MY TICKETS", font=self.font1, bg=self.whitecolor,
+              fg=self.bluecolor).grid(row=0, column=0, sticky=NW, pady=(10, 30), padx=(70, 0))
+        self.treeframe = Frame(self.tickets_page, bg=self.whitecolor, width=950,height=270)
+        style = ttk.Style()
+        style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=self.font5,rowheight=30)  # Modify the font of the body
+        style.configure("mystyle.Treeview.Heading", borderwidth=1, background=self.bluecolor,foreground=self.whitecolor, relief='flat',
+                        font=self.font5)  # Modify the font of the headings
+        style.layout("mystyle.Treeview", [('mystyle.Treeview.treearea', {'sticky': 'nswe'})])  # Remove the borders
+        self.scrolly = Scrollbar(self.treeframe)
+        self.scrolly.pack(side=RIGHT, fill=Y)
+        self.scrollx = Scrollbar(self.treeframe, orient='horizontal')
+        self.scrollx.pack(side=BOTTOM, fill=X)
+        self.ticketstree = ttk.Treeview(self.treeframe, height=13, yscrollcommand=self.scrolly.set,
+                                        xscrollcommand=self.scrollx.set,
+                                        style="mystyle.Treeview", selectmode='browse')
+        self.ticketstree.pack(fill=X)
+        self.treeframe.pack_propagate(0)
+        self.scrolly.config(command=self.ticketstree.yview)
+        self.scrollx.config(command=self.ticketstree.xview)
+        # self.load_treeview_data()
+        self.treeframe.grid(row=1,column=0,sticky=NW,padx=(30,20),columnspan=2)
+
         self.saved = []
         self.way_count=False
         self.page_count=1
         self.completed=False
+
+    def edit_profile_action(self):
+        fname = self.f_name_ent.get().lower()
+        mname = self.m_name_ent.get().lower()
+        lname = self.l_name_ent.get().lower()
+        gend = self.gend.lower()
+        mail = self.email_ent.get().lower()
+        phone = self.phone_ent.get()
+        newpass=self.newpass_ent.get()
+        password = self.password_ent.get()
+        if fn.login_validate(self.username,password):
+            data = [(lname, mname, fname, gend, mail, phone, newpass,self.username)]
+            if fname != '' and mname != '' and lname != '' and mail != '' and phone != '' and newpass != '':
+                if not fn.check_name(fname):
+                    messagebox.showerror('ERROR', 'invalid first name')
+                elif not fn.check_name(mname):
+                    messagebox.showerror('ERROR', 'invalid middle name')
+                elif not fn.check_name(fname):
+                    messagebox.showerror('ERROR', 'invalid last name')
+                elif not fn.check_email(mail):
+                    messagebox.showerror('ERROR', 'invalid Email address')
+                elif not fn.check_phone(phone):
+                    messagebox.showerror('ERROR', 'invalid phone number')
+                elif fn.check_email_exists(mail) and self.email!=mail:
+                    messagebox.showerror('ERROR', 'email already exists')
+                elif fn.check_phone_exists(phone) and self.phone_num!=phone:
+                    messagebox.showerror('ERROR', 'phone number already exists')
+                elif not fn.check_pass(newpass):
+                    messagebox.showerror('ERROR', 'INVALID PASSWORD')
+                else:
+                    fn.update_customer_data(data)
+                    messagebox.showinfo("SUCCESS","RE-LOGIN TO VIEW CHANGES")
+                    self.newpass_ent.delete(0,END)
+                    self.password_ent.delete(0,END)
+            else:
+                messagebox.showerror('ERROR', 'ALL FIELDS ARE REQUIRED')
+        else:
+            messagebox.showerror("ERROR","INVALID PASSWORD")
+
+
+    def load_treeview_data(self):
+        style = ttk.Style()
+        style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=self.font5, rowheight=30)  # Modify the font of the body
+        style.configure("mystyle.Treeview.Heading", borderwidth=1, background=self.bluecolor,
+                        foreground=self.whitecolor, relief='flat',
+                        font=self.font5)  # Modify the font of the headings
+        style.layout("mystyle.Treeview", [('mystyle.Treeview.treearea', {'sticky': 'nswe'})])  # Remove the borders
+        header=("ticket number","seat number","train number","Passenger name","departure date",
+                                     "departure time","seat class","source","destination")
+        self.ticketstree['columns']=(header)
+        self.ticketstree.column("#0", width=0, stretch=NO)
+        for i in header:
+            self.ticketstree.column(i,anchor=W, width=70,minwidth=140)
+        self.ticketstree.column("source",anchor=W, width=100,minwidth=200)
+        self.ticketstree.column("destination",anchor=W, width=100,minwidth=200)
+        self.ticketstree.column("Passenger name",anchor=W, width=100,minwidth=200)
+
+        self.ticketstree.heading("#0", text="", anchor=W)
+        for i in header:
+            self.ticketstree.heading(i, text=i.upper(),anchor=W)
+        data=fn.get_full_booking(self.username)
+        counter = 0
+        for record in data:
+            self.ticketstree.insert(parent='', index='end', iid=counter, values=(record))
+            counter += 1
+
+    def clear_treeview(self):
+        for i in self.ticketstree.get_children():
+            self.ticketstree.delete(i)
 
     def seat_placement(self,cls,num,z):
         count=1
@@ -664,11 +762,11 @@ class LandingPage(Frame):
             if len(self.saved)==self.numvar.get():
                 s = ttk.Style()
                 s.theme_use('alt')
-                s.configure("green.Horizontal.TProgressbar",foreground=self.greencolor,background=self.greencolor)
+                s.configure("green.Horizontal.TProgressbar",foreground=self.bluecolor,background=self.bluecolor)
                 top=Toplevel()
                 top.title('loading...')
                 top.geometry('300x60+533+240')
-                Label(top,text='sending tickets to your mail',font=self.font4,fg=self.greencolor).pack()
+                Label(top,text='sending tickets to your mail',font=self.font4,fg=self.bluecolor).pack()
                 bar=Progressbar(top,style="green.Horizontal.TProgressbar",orient=HORIZONTAL,length=300,mode='indeterminate')
                 bar.pack(padx=10)
                 for i in range(self.numvar.get()):
@@ -829,13 +927,20 @@ class LandingPage(Frame):
             pass
 
     def page_switcher2(self,n):
-        pages=[self.landing_page,self.book_page,self.payment_page,self.edit_page,self.seat_selection_page]
-        colors=[self.bluecolor,self.whitecolor,self.lightgreycolor,self.lightgreycolor,self.lightgreycolor]
+        pages=[self.landing_page,self.book_page,self.payment_page,self.edit_page,self.seat_selection_page,self.tickets_page ]
+        colors=[self.bluecolor,self.whitecolor,self.lightgreycolor,self.lightgreycolor,self.lightgreycolor,self.whitecolor]
         for i in range(len(pages)):
             pages[i].grid_forget()
         pages[n].grid(row=1,column=0,sticky=NW)
         self.master.configure(bg=colors[n])
     def page_switcher(self,n):
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure('TCombobox', fieldbackground=self.lightgreycolor, background=self.lightgreycolor,
+                        foreground=self.greencolor)
+        style.map('TCombobox', fieldbackground=[('readonly', self.lightgreycolor)])
+        style.map('TCombobox', selectbackground=[('readonly', self.lightgreycolor)])
+        style.map('TCombobox', foreground=[('readonly', self.greencolor)])
         if n==2:
             if self.numvar.get():
                 if '' in self.get_pass_details()[0]:
@@ -855,10 +960,16 @@ class LandingPage(Frame):
                 date = self.selectdate.get_date()
                 time = self.go_timevar.get()
                 sid=fn.get_schedule_id(source,dest,date,time)
-                messagebox.showinfo('SUCCESS','Payment successful')
-                self.seat_placement(self.classval2, fn.get_num_of_seats(sid,self.classval), fn.get_seats(self.classval,sid))
-                self.page_switcher2(n)
-                self.completed=True
+                num_of_seats=fn.get_num_of_seats(sid,self.classval)
+                taken_seats= fn.get_seats(self.classval,sid)
+                if num_of_seats-len(taken_seats)<self.numvar.get():
+                    messagebox.showerror("FAIL",'Insufficient Seats,\nPleaase select different class')
+                    self.page_switcher(1)
+                else:
+                    messagebox.showinfo('SUCCESS','Payment successful')
+                    self.seat_placement(self.classval2, num_of_seats, taken_seats)
+                    self.page_switcher2(n)
+                    self.completed=True
             else:
                 messagebox.showerror('CHILL','PLS COMPLETE PAYMENT INFO')
         else:
@@ -883,12 +994,15 @@ class LandingPage(Frame):
         if item=='PROFILE':
             self.page_switcher(3)
         elif item=='TICKETS':
-            self.page_switcher(3)
+            self.clear_treeview()
+            self.load_treeview_data()
+            self.page_switcher(5)
         elif item== 'LOGOUT':
             if self.completed:
                 messagebox.showwarning('HOLD UP','PLEASE COMPLETE BOOKING')
             else:
                 self.master.destroy()
+                self.master.master.deiconify()
 
 
     def on_enter(self,event):
@@ -993,15 +1107,17 @@ class LandingPage(Frame):
         self.cmd(0)
         self.page_switcher(1)
 
+    def close_all(self):
+        if messagebox.askokcancel("QUIT","Are you sure you want to quit?"):
+            self.master.master.destroy()
 
 
-
-root=Tk()
-root.resizable(0, 0)
-root.configure(bg='#110445')
-root.geometry('1000x600+183+60')
-root.title('TRAIN PLUS+')
-root.iconbitmap('hyperloop.ico')
-# root.overrideredirect(1)
-apk = LandingPage(root)
-apk.mainloop()
+# root=Tk()
+# root.resizable(0, 0)
+# root.configure(bg='#110445')
+# root.geometry('1000x600+183+60')
+# root.title('TRAIN PLUS+')
+# root.iconbitmap('hyperloop.ico')
+# # root.overrideredirect(1)
+# apk = LandingPage(root)
+# apk.mainloop()

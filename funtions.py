@@ -273,10 +273,25 @@ def get_full_booking(username='sugarpops'):
                         FROM tickets
                         INNER JOIN schedule
                         ON tickets.schedule_num = schedule.schedule_id
-                        
-                        WHERE username=?""",(username,)).fetchone()
-    for i in data:
-        print(i)
+                        WHERE username=?
+                        ORDER BY dep_date""",(username,)).fetchall()
     conn.commit()
     conn.close()
-# get_full_booking()
+    return data
+
+def update_customer_data(data):
+    conn = sqlite3.connect('railly.db')
+    c = conn.cursor()
+    c.executemany("""UPDATE customer_info
+                        SET lastname=?, middlename=?, firstname=?, gender=?, email=?, phonenumber=?, password=?
+                        WHERE username=?""", data)
+    conn.commit()
+    conn.close()
+
+def get_all_trains():
+    conn = sqlite3.connect('railly.db')
+    c = conn.cursor()
+    trains=c.execute("SELECT * FROM trains").fetchall()
+    conn.commit()
+    conn.close()
+    return trains

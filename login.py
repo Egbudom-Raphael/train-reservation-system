@@ -1,16 +1,17 @@
 from tkinter import *
 from tkinter import font as f
-from PIL import ImageTk, Image
-import random
-from tkinter import ttk
+# from PIL import ImageTk, Image
+# import random
+# from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk, Image
 import funtions as fn
+import userpage as uspg
 
 
-class LandingPage(Frame):
+class LoginPage(Frame):
     def __init__(self, master):
-        super(LandingPage, self).__init__(master)
+        super(LoginPage, self).__init__(master)
         self.master=master
         self.grid()
         self.font1=f.Font(family='Yu Gothic UI Light', size=25, weight='normal')
@@ -218,6 +219,16 @@ class LandingPage(Frame):
             print(check)
             self.reset(0)
             messagebox.showinfo('Login Successful',f'Welcome {check[0][3].title()}')
+            userdata=[check[0][0],check[0][1],check[0][2],check[0][3],check[0][4],check[0][5],check[0][6]]
+            print(userdata)
+            self.master.withdraw()
+            self.userWindow = Toplevel(self.master)
+            self.userWindow.resizable(0, 0)
+            self.userWindow.configure(bg=self.bluecolor)
+            self.userWindow.geometry('1000x600+183+60')
+            self.userWindow.title('TRAIN PLUS+')
+            self.userWindow.iconbitmap('hyperloop.ico')
+            uspg.LandingPage(self.userWindow,userdata)
         else:
             messagebox.showerror('Login Failed','Invalid username or password')
 
@@ -230,7 +241,7 @@ class LandingPage(Frame):
         type=0
         mail=self.email.get().lower()
         phone=self.phone.get().lower()
-        password=self.password_ent.get().lower()
+        password=self.password_ent.get()
         data=[(user,lname,mname,fname,gend,mail,phone,password,type)]
         if fname!='' and mname!='' and lname!='' and user!='' and mail!='' and phone!='' and password!='':
             if not fn.check_name(fname):
@@ -288,5 +299,5 @@ root.configure(bg='#110445')
 root.geometry('800x500+283+110')
 root.title('R A I L L Y')
 # root.overrideredirect(1)
-apk = LandingPage(root)
+apk = LoginPage(root)
 apk.mainloop()
