@@ -118,15 +118,18 @@ class AdminPage(Frame):
               fg=self.bluecolor).grid(row=0,column=0,sticky=NW,padx=(20),pady=(0,30))
         self.traintop=Frame(self.trainspage,bg=self.whitecolor)
         self.traintop.grid(row=1,column=0,columnspan=2,sticky=NW,pady=(0,40))
-        self.newtrain=Button(self.traintop,text='ADD NEW TRAIN',bg=self.whitecolor,fg=self.bluecolor,border=0,cursor='hand2',font=self.font4)
+        self.newtrain=Button(self.traintop,text='ADD NEW TRAIN',bg=self.whitecolor,fg=self.bluecolor,border=0,
+                             command=self.newtrain_action,cursor='hand2',font=self.font4)
         self.newtrain.grid(row=1,column=0,padx=(26,0),sticky=NW)
         self.trf1=Frame(self.traintop,bg=self.whitecolor,width=134,height=3)
         self.trf1.grid(row=2,column=0,padx=(26,0),sticky=NW)
-        self.viewtrain=Button(self.traintop,text='VIEW TRAINS',padx=10,bg=self.lightgreycolor,fg=self.bluecolor,border=0,cursor='hand2',font=self.font4)
+        self.viewtrain=Button(self.traintop,text='VIEW TRAINS',padx=10,bg=self.lightgreycolor,fg=self.bluecolor,border=0,
+                              command=self.viewtrain_action,cursor='hand2',font=self.font4)
         self.viewtrain.grid(row=1,column=1,padx=(0,550),sticky=NW)
         self.trf2=Frame(self.traintop,bg=self.bluecolor,width=124,height=3)
         self.trf2.grid(row=2,column=1,padx=(0,0),sticky=NW)
         ttk.Separator(self.traintop,orient='horizontal').grid(row=3,column=0,columnspan=2,padx=26,sticky=EW)
+
 
 
         # ADD NEW TRAIN PAGE
@@ -134,24 +137,29 @@ class AdminPage(Frame):
         # self.newtrainfrm.grid(row=2, column=0, sticky=NW, padx=26, columnspan=2)
         Label(self.newtrainfrm,text='TRAIN NAME: ',bg=self.whitecolor,fg=self.bluecolor,font=self.font4).grid(row=0,column=0,pady=(25,0),sticky=NW)
         self.trainname=Entry(self.newtrainfrm,bg=self.whitecolor,width=30,fg=self.darkgreencolor,border=0,font=self.font4)
-        self.trainname.grid(row=0,column=1,pady=(25,0),sticky=NW)
+        self.trainname.grid(row=0,column=1,pady=(25,0),sticky=SW)
         # ttk.Separator(self.newtrainfrm,orient='horizontal').grid(row=1,column=1,sticky=EW)
-        Frame(self.newtrainfrm,bg=self.bluecolor,width=300,height=2).grid(row=1,column=1,sticky=NW)
+        Frame(self.newtrainfrm,bg=self.bluecolor,width=272,height=2).grid(row=1,column=1,sticky=NW)
         Label(self.newtrainfrm,text='FIRST CLASS CAPACITY: ',bg=self.whitecolor,fg=self.bluecolor,font=self.font4).grid(row=2,column=0,pady=(25,0), sticky=NW)
-        self.fc_capacity=Entry(self.newtrainfrm,bg=self.whitecolor,width=6,fg=self.darkgreencolor,border=0,font=self.font4)
-        self.fc_capacity.grid(row=2,column=1,pady=(25,0),sticky=NW)
+        self.fc_capacity=Spinbox(self.newtrainfrm,from_=1,to=100,bg=self.whitecolor,fg=self.bluecolor,font=self.font4,border=0,
+                          repeatinterval=80,width=5)
+        self.fc_capacity.grid(row=2,column=1,pady=(25,0),sticky=SW)
         Frame(self.newtrainfrm, bg=self.bluecolor, width=60, height=2).grid(row=3, column=1, sticky=NW)
         Label(self.newtrainfrm,text='SECOND CLASS CAPACITY: ',bg=self.whitecolor,fg=self.bluecolor,font=self.font4).grid(row=4,column=0,pady=(25,0), sticky=NW)
-        self.bc_capacity=Entry(self.newtrainfrm,bg=self.whitecolor,width=6,fg=self.darkgreencolor,border=0,font=self.font4)
-        self.bc_capacity.grid(row=4,column=1,pady=(25,0),sticky=NW)
+        self.bc_capacity=Spinbox(self.newtrainfrm,from_=1,to=100,bg=self.whitecolor,fg=self.bluecolor,font=self.font4,border=0,
+                          repeatinterval=80,width=5)
+        self.bc_capacity.grid(row=4,column=1,pady=(25,0),sticky=SW)
         Frame(self.newtrainfrm, bg=self.bluecolor, width=60, height=2).grid(row=5, column=1, sticky=NW)
         Label(self.newtrainfrm,text='REGULAR COACH CAPACITY: ',bg=self.whitecolor,fg=self.bluecolor,font=self.font4).grid(row=6,column=0,pady=(25,0), sticky=NW)
-        self.rc_capacity=Entry(self.newtrainfrm,bg=self.whitecolor,width=6,fg=self.darkgreencolor,border=0,font=self.font4)
-        self.rc_capacity.grid(row=6,column=1,pady=(25,0),sticky=NW)
+        self.rc_capacity=Spinbox(self.newtrainfrm,from_=1,to=100,bg=self.whitecolor,fg=self.bluecolor,font=self.font4,border=0,
+                          repeatinterval=80,width=5,cursor='hand2')
+        self.rc_capacity.grid(row=6,column=1,pady=(25,0),sticky=SW)
         Frame(self.newtrainfrm, bg=self.bluecolor, width=60, height=2).grid(row=7, column=1, sticky=NW)
         self.addtrainbtn=Button(self.newtrainfrm,text='S U B M I T',pady=3,padx=5,bg=self.greencolor,font=self.font4,
                                 fg=self.whitecolor,border=0,cursor='hand2')
         self.addtrainbtn.grid(row=8,column=1,sticky=NE)
+
+
 
 
 
@@ -169,8 +177,24 @@ class AdminPage(Frame):
         self.scrolly.config(command=self.trainstree.yview)
         self.scrollx.config(command=self.trainstree.xview)
         self.load_treeview_data()
+        self.newtrainfrm.grid_forget()
         self.viewtrainfrm.grid(row=2,column=0, sticky=NW, padx=26, columnspan=2)
 
+
+    def newtrain_action(self):
+        self.newtrain.config(bg=self.lightgreycolor)
+        self.trf1.config(bg=self.bluecolor)
+        self.viewtrain.config(bg=self.whitecolor)
+        self.trf2.config(bg=self.whitecolor)
+        self.viewtrainfrm.grid_forget()
+        self.newtrainfrm.grid(row=2, column=0, sticky=NW, padx=26, columnspan=2)
+    def viewtrain_action(self):
+        self.newtrain.config(bg=self.whitecolor)
+        self.trf1.config(bg=self.whitecolor)
+        self.viewtrain.config(bg=self.lightgreycolor)
+        self.trf2.config(bg=self.bluecolor)
+        self.newtrainfrm.grid_forget()
+        self.viewtrainfrm.grid(row=2, column=0, sticky=NW, padx=26, columnspan=2)
 
 
     def load_treeview_data(self):

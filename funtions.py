@@ -239,7 +239,8 @@ def send_mail(tknum,email):
     conn.commit()
     conn.close()
     print(data)
-    message=f"""Subject: YOUR TICKET\n
+    message=f"""Subject: noreply\n
+            Your ticket\n
             Ticket number: \t{data[0]}\n
             Seat number: \t{data[1]}\n
             Train number: \t{data[2]}\n
