@@ -8,7 +8,7 @@ def convert(date):
 
      
 def CreateDatabase():
-    conn = sqlite3.connect('railly.db',
+    conn = sqlite3.connect('trainplus.db',
                            detect_types=sqlite3.PARSE_DECLTYPES |
                                         sqlite3.PARSE_COLNAMES)
     c = conn.cursor()
@@ -45,15 +45,16 @@ def CreateDatabase():
                      name VARCHAR NOT NULL,
                      first_class_capacity INTEGER NOT NULL DEFAULT 0,
                      business_class_capacity INTEGER NOT NULL DEFAULT 0,
-                     regular_coach_capacity INTEGER NOT NULL DEFAULT 0
+                     regular_coach_capacity INTEGER NOT NULL DEFAULT 0,
+                     status VARCHAR check(status in ('active','out of service')) NOT NULL
                     )""")
 
-    data=[( 'TIR-1001', 'Train 101', 24, 40, 88),
-          ('TIR-1002', 'Train 102', 30, 40, 50),
-          ('TIR-1003', 'Train 103', 30, 50, 92),
-          ('TIR-1004', 'Train 104', 12, 50, 70),
-          ('TIR-1005', 'Train 105', 20, 45, 70)]
-    c.executemany("INSERT INTO trains(train_id, name, first_class_capacity, business_class_capacity, regular_coach_capacity) VALUES(?,?,?,?,?)",data)
+    data=[( 'TIR-1001', 'Train 101', 24, 40, 88,'active'),
+          ('TIR-1002', 'Train 102', 30, 40, 50,'out of service'),
+          ('TIR-1003', 'Train 103', 30, 50, 92,'active'),
+          ('TIR-1004', 'Train 104', 12, 50, 70,'active'),
+          ('TIR-1005', 'Train 105', 20, 45, 70,'active')]
+    c.executemany("INSERT INTO trains(train_id, name, first_class_capacity, business_class_capacity, regular_coach_capacity, status) VALUES(?,?,?,?,?,?)",data)
 
     #SCHEDULES
     c.execute("""CREATE TABLE IF NOT EXISTS schedule(

@@ -7,7 +7,7 @@ from tkinter import messagebox
 from PIL import ImageTk, Image
 import funtions as fn
 import userpage as uspg
-
+import adminpage as ampg
 
 class LoginPage(Frame):
     def __init__(self, master):
@@ -221,14 +221,26 @@ class LoginPage(Frame):
             messagebox.showinfo('Login Successful',f'Welcome {check[0][3].title()}')
             userdata=[check[0][0],check[0][1],check[0][2],check[0][3],check[0][4],check[0][5],check[0][6]]
             print(userdata)
-            self.master.withdraw()
-            self.userWindow = Toplevel(self.master)
-            self.userWindow.resizable(0, 0)
-            self.userWindow.configure(bg=self.bluecolor)
-            self.userWindow.geometry('1000x600+183+60')
-            self.userWindow.title('TRAIN PLUS+')
-            self.userWindow.iconbitmap('hyperloop.ico')
-            uspg.LandingPage(self.userWindow,userdata)
+            if check[0][8]==0:
+                self.master.withdraw()
+                self.userWindow = Toplevel(self.master)
+                self.userWindow.resizable(0, 0)
+                self.userWindow.configure(bg=self.bluecolor)
+                self.userWindow.geometry('1000x600+183+60')
+                self.userWindow.title('TRAIN PLUS+')
+                self.userWindow.iconbitmap('hyperloop.ico')
+                uspg.LandingPage(self.userWindow,userdata)
+
+            elif check[0][1]:
+                self.master.withdraw()
+                self.adminwindow = Toplevel(self.master)
+                self.adminwindow.resizable(0, 0)
+                self.adminwindow.configure(bg='white')
+                self.adminwindow.geometry('1100x670+133+10')
+                self.adminwindow.title('TRAIN PLUS+')
+                self.adminwindow.iconbitmap('hyperloop.ico')
+                ampg.AdminPage(self.adminwindow,userdata)
+
         else:
             messagebox.showerror('Login Failed','Invalid username or password')
 

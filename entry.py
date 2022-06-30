@@ -114,3 +114,12 @@ class Entry(tk.Text):
         if self.tag_ranges("predictive") and self.tag_ranges("predictive")[0].string == "1.0":
             self.tag_remove("predictive", "1.0", "end-1c")
         self.input()
+
+root=tk.Tk()
+root.resizable(0, 0)
+root.configure(bg='white')
+root.geometry('1100x670+133+10')
+list=['ra','ba','za','pla','ja']
+entry=Entry(root,predictive_list=list,background='blue')
+entry.grid(row=0,column=0)
+root.mainloop()
