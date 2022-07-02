@@ -96,16 +96,16 @@ def register_customer(data):
 
 #++++++++++++++++++++++++++++++++++++++++++++++booking functions++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 def get_sources():
-    date=datetime.datetime.today().date()
     conn = sqlite3.connect('trainplus.db')
     c = conn.cursor()
-    sources=set(c.execute("SELECT dep_location FROM schedule WHERE end_date>=? ORDER BY dep_location DESC",(date,)).fetchall())
+    sources=set(c.execute("SELECT dep_location FROM schedule ORDER BY dep_location DESC").fetchall())
     conn.commit()
     conn.close()
     source_list=[]
     for i in sources:
         source_list.append(i[0])
     return source_list
+
 
 
 def get_destinations(source):
@@ -430,7 +430,6 @@ def get_trainid(name):
     return data[0]
 
 def get_all_tickets():
-    sources = get_sources()
     conn = sqlite3.connect('trainplus.db')
     c = conn.cursor()
     data=c.execute("""SELECT username,ticket_num,seat_num,train_id,p_name,dep_date,dep_time,class,dep_location,arr_location
@@ -460,8 +459,8 @@ def plot_pie():
 
     piechart = Figure(figsize=(3, 3), dpi=70, facecolor=lightgrey)
     bx = piechart.add_subplot(111)
-    exploded = [0.1, 0.2, 0.1, 0,0]
-    patches, texts, autotexts = bx.pie(location, explode=exploded, autopct='%1.1f%%')
+    # exploded = [0.1, 0.2, 0.1, 0,0]
+    patches, texts, autotexts = bx.pie(location, autopct='%1.1f%%')
     bx.set_title('BOARDING RATES', color='r',fontsize=14, font='Arial')
     for text in texts:
         text.set_color(greencolor)
@@ -479,7 +478,7 @@ def plot_pie2():
     count=0
     for x in dest:
         for y in tickets:
-            if x in y[8]:
+            if x in y[9]:
                 count+=1
         location.append(count)
         count=0
@@ -488,8 +487,8 @@ def plot_pie2():
 
     piechart = Figure(figsize=(3, 3), dpi=75, facecolor=lightgrey)
     bx = piechart.add_subplot(111)
-    exploded = [0.1, 0, 0, 0]
-    patches, texts, autotexts = bx.pie(location, explode=exploded, autopct='%1.1f%%')
+    # exploded = [0.1, 0, 0, 0]
+    patches, texts, autotexts = bx.pie(location, autopct='%1.1f%%')
     bx.set_title('DESTINATION RATES', color='#110445',fontsize=14, font='Arial')
     for text in texts:
         text.set_color(greencolor)
@@ -520,10 +519,11 @@ def plot_barchart():
     ax = figure.add_subplot(111)
     ax.set_facecolor(lightgrey)
     x_axis = np.arange(len(location))
-    ax.bar(x_axis + 0.15, location[0], width=0.15, label=sources[0])
-    ax.bar(x_axis + 0.15 * 2, location[1], width=0.15, label=sources[1])
-    ax.bar(x_axis + 0.15 * 3, location[2], width=0.15, label=sources[2])
-    ax.bar(x_axis + 0.15 * 4, location[3], width=0.15, label=sources[3], color=greencolor)
+    j=1
+    for i in sus2:
+        ax.bar(x_axis + 0.15*j, location[j-1], width=0.15, label=i)
+        # print(i)
+        j+=1
     ax.set_xticks(0.35 + x_axis)
     ax.set_xticklabels(sources)
     # plt.xticks(0.35+x_axis, states)

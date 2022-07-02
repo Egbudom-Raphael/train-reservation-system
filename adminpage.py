@@ -14,7 +14,7 @@ from tkinter import messagebox
 from PIL import ImageTk, Image
 import funtions as fn
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,NavigationToolbar2Tk)
-# import threading
+import threading
 
 
 
@@ -75,6 +75,7 @@ class AdminPage(Frame):
         self.navimg2 = [self.dashicon2,self.trainicon2,self.scheduleicon2,self.addusericon2]
         self.pages=[self.dashpage,self.trainspage,self.schedulepage,self.adminpage]
         self.master.protocol("WM_DELETE_WINDOW",self.close_all)
+        self.stuck_solution()
 
     def create_widgets(self):
         self.logo = ImageTk.PhotoImage(Image.open("trainplus.png"))
@@ -180,7 +181,7 @@ class AdminPage(Frame):
         self.barframe.grid(row=0, column=0,columnspan=2,pady=(10, 10),padx=(10,0))
         self.barframe2=Frame(self.dashpanel,bg=self.lightgreycolor)
         self.barframe2.grid(row=1, column=1,columnspan=2,pady=(10, 10),padx=(10,0))
-        self.plotall()
+        # self.plotall()
 
 
 
@@ -593,6 +594,10 @@ class AdminPage(Frame):
         chart.draw()
         chart.get_tk_widget().grid(row=0, column=0)
 
+    def stuck_solution(self):
+        self.stuck=threading.Thread(target=self.plotall())
+        self.stuck.daemon=True
+        self.stuck.start()
 
     def load_treeview_data(self):
         style = ttk.Style()
